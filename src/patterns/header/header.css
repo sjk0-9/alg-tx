@@ -1,0 +1,12 @@
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .logo {
+    font-family: 'Baloo Da 2';
+    @apply 
+      select-none
+      text-xl
+      text-teal-700
+  }
+}

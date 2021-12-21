@@ -93,7 +93,7 @@ const AddWalletRow = ({ name, connector }: AddWalletRowProps) => (
         className={`menu-item ${active && 'menu-item-active'}`}
         onClick={connector}
       >
-        <div className="flex flex-row items-center gap-1">
+        <div className="flex flex-row items-center w-max gap-1">
           <PlusIcon className="w-5 h-5" />
           {name}
         </div>
@@ -161,7 +161,7 @@ const WalletDropdown = () => {
         wallet={disconnectWallet}
         onClose={() => setDisconnectWallet(undefined)}
       />
-      <Menu>
+      <Menu as="div" className="menu-wrapper">
         {({ open }) => (
           <>
             {activeWallet ? (
@@ -184,7 +184,7 @@ const WalletDropdown = () => {
             >
               <Menu.Items className="menu-dropdown">
                 {!!wallets.length && (
-                  <div className="py-2">
+                  <div className="menu-item-section">
                     {wallets.map(wallet => (
                       <WalletRow
                         key={wallet.address}
@@ -195,7 +195,7 @@ const WalletDropdown = () => {
                     ))}
                   </div>
                 )}
-                <div className="py-2">
+                <div className="menu-item-section">
                   <AddWalletRow
                     name="Algorand App"
                     connector={wrappedConnector(connectors.walletConnect)}

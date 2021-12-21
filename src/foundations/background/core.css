@@ -1,0 +1,9 @@
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  html {
+    @apply
+      bg-zinc-100;
+  }
+}

@@ -2,14 +2,22 @@
 @tailwind utilities;
 
 @layer components {
+  .menu-wrapper {
+    @apply
+      relative
+      inline-block
+  }
   .menu-button {
     @apply
-      py-2 px-4
+      py-1 px-2
+      sm:py-2 sm:px-4
       bg-teal-700 hover:bg-teal-800
       focus:ring
       rounded-md
       drop-shadow-sm
       text-white
+      text-sm
+      sm:text-base
   }
 
   .menu-dropdown {
@@ -19,21 +27,33 @@
       bg-zinc-50
       rounded-md
       drop-shadow-sm
-      max-w-xs
-      min-w-fit
+      min-w-full
       focus:outline-none
       divide-y
       divide-zinc-200
+      absolute
+      right-0
+      origin-top-right
+  }
+
+  .menu-item-section {
+    @apply
+      py-2
+      min-w-full
+      flex
+      flex-col
   }
 
   .menu-item {
     @apply
       text-left
-      py-2 px-4
+      py-1 px-4
+      sm:py-2 sm:px-4
       hover:bg-zinc-100 active:bg-zinc-200
       cursor-pointer
-      min-w-fit
-      w-full
+      min-w-max
+      text-sm
+      sm:text-base
   }
 
   .menu-item-active {
