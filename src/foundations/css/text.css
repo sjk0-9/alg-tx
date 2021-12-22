@@ -1,0 +1,20 @@
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  a {
+    @apply
+      text-primary
+      hover:text-primary-h
+      active:text-primary-a;
+  }
+
+  .code-block {
+    @apply
+      font-mono
+      bg-grey-100
+      p-2
+      rounded
+      overflow-hidden;
+  }
+}

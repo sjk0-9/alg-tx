@@ -7,14 +7,22 @@ export type TxToSign = {
 };
 
 export type Wallet = {
+  id: string;
   address: string;
+  name?: string;
   sign: (transactions: TxToSign[]) => Promise<any>;
   disconnect: () => Promise<any>;
-} & {
-  type: 'WalletConnect';
-  connector: WalletConnect;
-};
+} & (
+  | {
+      type: 'WalletConnect';
+      connector: WalletConnect;
+    }
+  | {
+      type: 'MyAlgo';
+    }
+);
 
 export type Connectors = {
   walletConnect: () => Promise<void>;
+  myAlgo: () => Promise<void>;
 };

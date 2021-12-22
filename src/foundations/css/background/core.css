@@ -4,6 +4,6 @@
 @layer components {
   html {
     @apply
-      bg-zinc-100;
+      bg-grey-100;
   }
 }

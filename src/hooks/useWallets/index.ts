@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import usePrevious from '../usePrevious';
+import useMyAlgoConnect from './myAlgo';
 import { Connectors, Wallet } from './types';
 import useWalletConnect from './walletConnect';
 
@@ -12,13 +13,15 @@ type UseWalletsType = {
 
 const useWallets = (): UseWalletsType => {
   const [wcWallets, wcConnector] = useWalletConnect();
+  const [maWallets, maConnector] = useMyAlgoConnect();
   const [activeWallet, setActiveWallet] = useState<Wallet | undefined>();
 
   const connectors = {
     walletConnect: wcConnector,
+    myAlgo: maConnector,
   };
 
-  const wallets = [...wcWallets];
+  const wallets = [...wcWallets, ...maWallets];
 
   const walletAddresses = wallets.map(w => w.address);
   const previousWallets = usePrevious<string[]>(walletAddresses);

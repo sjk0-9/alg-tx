@@ -8,7 +8,8 @@
       focus:ring
       rounded-md
       drop-shadow-sm
-      flex items-center gap-1
+      text-center
+      flex items-center justify-center gap-1
   }
 
   .btn-primary {
@@ -21,7 +22,14 @@
   .btn-secondary {
     @apply
       btn
-      bg-zinc-100 hover:bg-zinc-200
+      bg-grey-100 hover:bg-grey-200
+  }
+
+  .btn-danger {
+    @apply
+      btn
+      bg-red-600 hover:bg-red-700
+      text-white
   }
 
 }

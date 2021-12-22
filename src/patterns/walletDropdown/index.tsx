@@ -1,87 +1,112 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import {
   CashIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  ExternalLinkIcon,
+  IdentificationIcon,
+  PencilIcon,
   PlusIcon,
+  QuestionMarkCircleIcon,
   TrashIcon,
 } from '@heroicons/react/solid';
 
+import { Link } from 'react-router-dom';
 import useWallets from '../../hooks/useWallets';
 import { Wallet } from '../../hooks/useWallets/types';
-import { shortenAddress } from '../../helpers/address';
-import Dialog from '../../components/Dialog';
+import { walletName } from '../../lib/helpers/wallet';
 
-import '../../components/css/menuDropdown.css';
-import '../../components/css/button.css';
-import Spinner from '../../foundations/spinner';
-import WrappedSpinner from '../../foundations/spinner/wrapped';
+import DisconnectWalletDialog from './disconnectModal';
+import HelpDialog from './helpModal';
+import { NetworkContext } from '../../contexts';
+import { Networks } from '../../lib/algo/clients';
+import EditWalletDialog from './editModal';
 
 type MenuButtonProps = {
   activeWallet: Wallet;
   open: boolean;
-  loading: boolean;
 };
 
-const MenuButtonWithWallet = ({
-  activeWallet,
-  open,
-  loading,
-}: MenuButtonProps) => (
+const MenuButtonWithWallet = ({ activeWallet, open }: MenuButtonProps) => (
   <Menu.Button className="menu-button">
-    <WrappedSpinner loading={loading}>
-      <div className="flex items-center gap-1">
-        <CashIcon className="w-5 h-5 mr-1" />
-        {shortenAddress(activeWallet.address)}
-        {open ? (
-          <ChevronUpIcon className="w-5 h-5" />
-        ) : (
-          <ChevronDownIcon className="w-5 h-5" />
-        )}
-      </div>
-    </WrappedSpinner>
+    <div className="flex items-center gap-1">
+      <CashIcon className="w-5 h-5 mr-1" />
+      {walletName(activeWallet)}
+      {open ? (
+        <ChevronUpIcon className="w-5 h-5" />
+      ) : (
+        <ChevronDownIcon className="w-5 h-5" />
+      )}
+    </div>
   </Menu.Button>
 );
 
-const MenuButtonNoWallet = ({ loading }: { loading: boolean }) => (
-  <Menu.Button className="menu-button">
-    {loading ? <Spinner /> : 'Connect a wallet'}
-  </Menu.Button>
+const MenuButtonNoWallet = () => (
+  <Menu.Button className="menu-button">Connect a wallet</Menu.Button>
 );
 
 type WalletRowProps = {
   wallet: Wallet;
   disconnectWallet: (wallet: Wallet) => void;
   setActiveWallet: (wallet: Wallet) => void;
+  editWallet: (wallet: Wallet) => void;
 };
 
 const WalletRow = ({
   wallet,
   disconnectWallet,
   setActiveWallet,
+  editWallet,
 }: WalletRowProps) => (
-  <>
-    <Menu.Item key={wallet.address}>
+  <div key={wallet.address} className="relative">
+    <Menu.Item>
       {({ active }) => (
         <div
-          className={`menu-item ${active && 'menu-item-active'}`}
+          className={`menu-item ${active && 'menu-item-active'} pr-20`}
           onClick={() => setActiveWallet(wallet)}
         >
           <div className="flex flex-row items-center gap-3">
-            {shortenAddress(wallet.address)}
-            <TrashIcon
-              className="w-4 h-4 text-zinc-400 hover:text-red-600 active:text-red-700"
-              onClick={e => {
-                e.stopPropagation();
-                disconnectWallet(wallet);
-              }}
-            />
+            {walletName(wallet)}
           </div>
         </div>
       )}
     </Menu.Item>
-  </>
+    <Menu.Item>
+      {({ active }) => (
+        <div
+          onClick={e => {
+            e.stopPropagation();
+            editWallet(wallet);
+          }}
+          className="absolute inset-y-0 flex items-center justify-center cursor-pointer right-6 menu-item-margin"
+        >
+          <IdentificationIcon
+            className={`w-4 h-4 text-subtle hover:text-subtle-h active:text-subtle-a ${
+              active ? 'text-subtle-a' : ''
+            }`}
+          />
+        </div>
+      )}
+    </Menu.Item>
+    <Menu.Item>
+      {({ active }) => (
+        <div
+          onClick={e => {
+            e.stopPropagation();
+            disconnectWallet(wallet);
+          }}
+          className="absolute inset-y-0 right-0 flex items-center justify-center cursor-pointer menu-item-margin"
+        >
+          <TrashIcon
+            className={`w-4 h-4 text-subtle hover:text-red-600 active:text-red-700 ${
+              active ? 'text-red-600' : ''
+            }`}
+          />
+        </div>
+      )}
+    </Menu.Item>
+  </div>
 );
 
 type AddWalletRowProps = { name: string; connector: () => Promise<void> };
@@ -102,40 +127,42 @@ const AddWalletRow = ({ name, connector }: AddWalletRowProps) => (
   </Menu.Item>
 );
 
-const DisconnectWalletDialog = ({
-  wallet,
-  onClose,
-}: {
-  wallet?: Wallet;
-  onClose: () => void;
-}) => (
-  <Dialog
-    open={!!wallet}
-    onClose={onClose}
-    title="Disconnect account"
-    description={`This will disconnect your algorand wallet ${
-      wallet && shortenAddress(wallet.address)
-    }`}
-  >
-    <p className="my-2">
-      Are you sure you want to disconnect your algorand wallet?
-    </p>
-    <p className="my-2">You can reconnect again via the connection menu.</p>
-    <div className="flex flex-row justify-end mt-4 gap-2">
-      <button onClick={onClose} className="btn-secondary">
-        Cancel
-      </button>
+const SwitchNetworkRow = () => {
+  const network = useContext(NetworkContext);
+  const otherNetwork: Networks = network === 'mainnet' ? 'testnet' : 'mainnet';
+  const link = otherNetwork === 'mainnet' ? '/' : '/testnet';
+
+  return (
+    <Menu.Item>
+      {({ active }) => (
+        <Link
+          className={`menu-item ${active && 'menu-item-active'}`}
+          to={link}
+          target="_blank"
+        >
+          <div className="flex flex-row items-center w-max gap-1">
+            Use {otherNetwork}
+            <ExternalLinkIcon className="w-5 h-5 text-subtle" />
+          </div>
+        </Link>
+      )}
+    </Menu.Item>
+  );
+};
+const HelpRow = ({ onClick }: { onClick: () => void }) => (
+  <Menu.Item>
+    {({ active }) => (
       <button
-        className="btn-primary"
-        onClick={async () => {
-          await wallet?.disconnect();
-          onClose();
-        }}
+        className={`menu-item ${active && 'menu-item-active'}`}
+        onClick={onClick}
       >
-        Disconnect
+        <div className="flex flex-row items-center w-max gap-1">
+          <QuestionMarkCircleIcon className="w-5 h-5 text-subtle" />
+          Help
+        </div>
       </button>
-    </div>
-  </Dialog>
+    )}
+  </Menu.Item>
 );
 
 const WalletDropdown = () => {
@@ -143,35 +170,33 @@ const WalletDropdown = () => {
   const [disconnectWallet, setDisconnectWallet] = useState<
     Wallet | undefined
   >();
+  const [showDisconnectWallet, setShowDisconnectWallet] =
+    useState<boolean>(false);
+  const [editWallet, setEditWallet] = useState<Wallet | undefined>();
+  const [showEditWallet, setShowEditWallet] = useState<boolean>(false);
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const wrappedConnector = (connector: () => Promise<void>) => async () => {
-    setIsLoading(true);
-    try {
-      await connector();
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [showHelp, setShowHelp] = useState<boolean>(false);
 
   return (
     <>
       <DisconnectWalletDialog
+        open={showDisconnectWallet}
         wallet={disconnectWallet}
-        onClose={() => setDisconnectWallet(undefined)}
+        onClose={() => setShowDisconnectWallet(false)}
       />
+      <EditWalletDialog
+        open={showEditWallet}
+        wallet={editWallet}
+        onClose={() => setShowEditWallet(false)}
+      />
+      <HelpDialog open={showHelp} onClose={() => setShowHelp(false)} />
       <Menu as="div" className="menu-wrapper">
         {({ open }) => (
           <>
             {activeWallet ? (
-              <MenuButtonWithWallet
-                activeWallet={activeWallet}
-                open={open}
-                loading={isLoading}
-              />
+              <MenuButtonWithWallet activeWallet={activeWallet} open={open} />
             ) : (
-              <MenuButtonNoWallet loading={isLoading} />
+              <MenuButtonNoWallet />
             )}
             <Transition
               as={React.Fragment}
@@ -190,7 +215,14 @@ const WalletDropdown = () => {
                         key={wallet.address}
                         wallet={wallet}
                         setActiveWallet={setActiveWallet}
-                        disconnectWallet={setDisconnectWallet}
+                        editWallet={w => {
+                          setEditWallet(w);
+                          setShowEditWallet(true);
+                        }}
+                        disconnectWallet={w => {
+                          setDisconnectWallet(w);
+                          setShowDisconnectWallet(true);
+                        }}
                       />
                     ))}
                   </div>
@@ -198,12 +230,18 @@ const WalletDropdown = () => {
                 <div className="menu-item-section">
                   <AddWalletRow
                     name="Algorand App"
-                    connector={wrappedConnector(connectors.walletConnect)}
+                    connector={connectors.walletConnect}
                   />
                   <AddWalletRow
                     name="My Algo Wallet"
-                    connector={Promise.resolve}
+                    connector={connectors.myAlgo}
                   />
+                </div>
+                <div className="menu-item-section">
+                  <SwitchNetworkRow />
+                </div>
+                <div className="menu-item-section">
+                  <HelpRow onClick={() => setShowHelp(true)} />
                 </div>
               </Menu.Items>
             </Transition>

@@ -7,6 +7,10 @@
     @apply 
       select-none
       text-xl
-      text-teal-700
+      bg-clip-text text-transparent
+      bg-gradient-to-br from-teal-900 to-teal-600
+      transition-all
+      duration-500
+      motion-reduce:transition-none
   }
 }

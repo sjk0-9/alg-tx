@@ -63,6 +63,7 @@ const useWalletConnect = (): [Wallet[], () => Promise<void>] => {
     }
 
     return {
+      id: storageId,
       address: connector.accounts[0],
       sign: Promise.resolve,
       disconnect: async () => {

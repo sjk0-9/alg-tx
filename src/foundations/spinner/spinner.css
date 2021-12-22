@@ -5,6 +5,7 @@
  */
 .la-ball-grid-beat,
 .la-ball-grid-beat > div {
+    line-height: 0;
     position: relative;
     -webkit-box-sizing: border-box;
        -moz-box-sizing: border-box;

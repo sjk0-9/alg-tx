@@ -48,7 +48,7 @@ const Dialog = ({
           leaveTo="opacity-0 scale-95"
         >
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle bg-white shadow-xl transition-all transform rounded-2xl">
-            <HeadlessDialog.Title as="h3" className="text-lg font-medium">
+            <HeadlessDialog.Title as="h3" className="text-xl font-medium">
               {title}
             </HeadlessDialog.Title>
             <HeadlessDialog.Description className="sr-only">
