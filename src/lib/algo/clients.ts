@@ -8,19 +8,20 @@ type ServerAddress = {
 
 const ALGOD_TOKEN = '';
 const ALGOD_SERVER: ServerAddress = {
-  mainnet: 'https://algoexplorerapi.io/',
-  testnet: 'https://testnet.algoexplorerapi.io/',
+  mainnet: 'https://node.algoexplorerapi.io/v2',
+  testnet: 'https://node.testnet.algoexplorerapi.io/v2',
 };
 const ALGOD_PORT = '443';
 
 const INDEXER_TOKEN = '';
 const INDEXER_SERVER: ServerAddress = {
-  mainnet: 'https://algoexplorerapi.io/idx2/v2/',
-  testnet: 'https://testnet.algoexplorerapi.io/idx2/',
+  mainnet: 'https://algoindexer.algoexplorerapi.io/',
+  testnet: 'https://algoindexer.testnet.algoexplorerapi.io/',
 };
 const INDEXER_PORT = '443';
 
-const getClients = (network: 'mainnet' | 'testnet' = 'mainnet') => {
+// eslint-disable-next-line @typescript-eslint/naming-convention,no-underscore-dangle
+const getClients_ = (network: 'mainnet' | 'testnet') => {
   const algodClient = new algosdk.Algodv2(
     ALGOD_TOKEN,
     ALGOD_SERVER[network],
@@ -35,5 +36,13 @@ const getClients = (network: 'mainnet' | 'testnet' = 'mainnet') => {
 
   return { network, algodClient, indexerClient };
 };
+
+const clients = {
+  mainnet: getClients_('mainnet'),
+  testnet: getClients_('testnet'),
+};
+
+const getClients = (network: 'mainnet' | 'testnet' = 'mainnet') =>
+  clients[network];
 
 export default getClients;

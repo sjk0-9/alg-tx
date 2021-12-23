@@ -1,0 +1,10 @@
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .card {
+    @apply 
+      p-6
+      bg-white rounded-md drop-shadow-sm;
+  }
+}
