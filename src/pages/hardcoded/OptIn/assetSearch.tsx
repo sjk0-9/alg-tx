@@ -51,9 +51,14 @@ const AssetSearchBar = ({ onSelect }: AssetSearchBarParams) => {
   return (
     <SearchBox
       searchString={searchString}
+      searchDescriptor="Search for asset to add"
+      placeholder="Search for asset by ID, name or creator"
       onSearchChange={setSearchString}
       options={options}
-      onSelect={() => {}}
+      onSelect={option => {
+        onSelect(option.id);
+      }}
+      loading={isLoading}
     />
   );
 };

@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import App from './App';
 import { Networks } from './lib/algo/clients';
 import hardcodedRouteList from './pages/hardcoded/Router';
+import Home from './pages/home';
 
 const networkSelectionRoutes = [
   ['/', 'mainnet'],
@@ -20,6 +21,7 @@ const Router = () => (
           path={path}
           element={<App root={path} network={network} />}
         >
+          <Route index element={<Home />} />
           <Route path="h">{hardcodedRouteList()}</Route>
         </Route>
       ))}

@@ -1,9 +1,16 @@
 import MyAlgoConnect, { Accounts } from '@randlabs/myalgo-connect';
 import createPersistedState from 'use-persisted-state';
-import { Wallet } from './types';
+import { TxToSign, Wallet } from './types';
 
 const useMyAlgoWallets = createPersistedState('myAlgoWallets');
 const myAlgoConnect = new MyAlgoConnect();
+
+const sign = async (transactions: TxToSign[]) => {
+  const toSign = transactions.map(({ txn }) => txn.toByte());
+  const signedTxns = await myAlgoConnect.signTransaction(toSign);
+  const parsedTxns = signedTxns.map(({ blob }) => blob);
+  return parsedTxns;
+};
 
 const useMyAlgoConnect = (): [Wallet[], () => Promise<void>] => {
   const [myAlgoWallets, setMyAlgoWallets] = useMyAlgoWallets<Accounts[]>([]);
@@ -19,7 +26,7 @@ const useMyAlgoConnect = (): [Wallet[], () => Promise<void>] => {
         id: `myalgo:${account.address}`,
         address: account.address,
         name: account.name || undefined,
-        sign: Promise.resolve,
+        sign,
         disconnect: async () => {
           setMyAlgoWallets(original =>
             original.filter(a => a.address !== account.address)

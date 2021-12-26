@@ -83,7 +83,7 @@ const WalletRow = ({
         >
           <IdentificationIcon
             className={`w-4 h-4 text-subtle hover:text-subtle-h active:text-subtle-a ${
-              active ? 'text-subtle-a' : ''
+              active ? 'text-subtle-h' : ''
             }`}
           />
         </div>

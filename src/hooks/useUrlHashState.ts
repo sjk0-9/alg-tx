@@ -9,13 +9,10 @@ type UseUrlStateReturn<T> = {
 const decodeJsonHash = (hash: string) => {
   // Remove the # at the start of the string
   const base64 = hash.slice(1);
-  console.log(base64);
   try {
     const decoded = fromBase64(base64);
-    console.log(decoded);
     return JSON.parse(decoded);
   } catch (e) {
-    console.error(e);
     return undefined;
   }
 };

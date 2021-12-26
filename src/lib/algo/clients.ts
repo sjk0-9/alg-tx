@@ -8,8 +8,8 @@ type ServerAddress = {
 
 const ALGOD_TOKEN = '';
 const ALGOD_SERVER: ServerAddress = {
-  mainnet: 'https://node.algoexplorerapi.io/v2',
-  testnet: 'https://node.testnet.algoexplorerapi.io/v2',
+  mainnet: 'https://node.algoexplorerapi.io/',
+  testnet: 'https://node.testnet.algoexplorerapi.io/',
 };
 const ALGOD_PORT = '443';
 

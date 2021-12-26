@@ -3,14 +3,18 @@ import { Transaction } from 'algosdk';
 
 export type TxToSign = {
   txn: Transaction;
-  message: string;
+  message?: string;
 };
+
+export type SignType = (
+  transactions: TxToSign[]
+) => Promise<(Uint8Array | null)[]>;
 
 export type Wallet = {
   id: string;
   address: string;
   name?: string;
-  sign: (transactions: TxToSign[]) => Promise<any>;
+  sign: SignType;
   disconnect: () => Promise<any>;
 } & (
   | {

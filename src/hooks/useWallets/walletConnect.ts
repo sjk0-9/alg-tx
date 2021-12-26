@@ -1,10 +1,12 @@
+import { formatJsonRpcRequest } from '@json-rpc-tools/utils';
 import WalletConnect from '@walletconnect/client';
 import QRCodeModal from 'algorand-walletconnect-qrcode-modal';
+import algosdk from 'algosdk';
 import { useEffect, useState } from 'react';
 import createPersistedState from 'use-persisted-state';
 
 import * as uuid from 'uuid';
-import { Wallet } from './types';
+import { TxToSign, Wallet } from './types';
 
 const useWCStorageIds = createPersistedState('walletConnectStorageIds');
 
@@ -29,6 +31,28 @@ const createNewConnector = async (): Promise<[string, WalletConnect]> => {
   });
 
   return [storageId, connector];
+};
+
+const sign = (connector: WalletConnect) => async (txs: TxToSign[]) => {
+  const txnWithbuffers = txs.map(({ txn, message }) => {
+    const encodedTxn = Buffer.from(
+      algosdk.encodeUnsignedTransaction(txn)
+    ).toString('base64');
+
+    return {
+      txn: encodedTxn,
+      message,
+    };
+  });
+
+  const request = formatJsonRpcRequest('algo_signTxn', [txnWithbuffers]);
+  const result: Array<string | null> = await connector.sendCustomRequest(
+    request
+  );
+  const decodedResult = result.map(r =>
+    r ? new Uint8Array(Buffer.from(r, 'base64')) : null
+  );
+  return decodedResult;
 };
 
 const useWalletConnect = (): [Wallet[], () => Promise<void>] => {
@@ -65,7 +89,7 @@ const useWalletConnect = (): [Wallet[], () => Promise<void>] => {
     return {
       id: storageId,
       address: connector.accounts[0],
-      sign: Promise.resolve,
+      sign: sign(connector),
       disconnect: async () => {
         connector.killSession();
         updateWCStorageIds(original => original.filter(v => v !== storageId));
@@ -80,7 +104,6 @@ const useWalletConnect = (): [Wallet[], () => Promise<void>] => {
     .map(({ missingConnection }) => missingConnection);
 
   useEffect(() => {
-    console.log('removed', removedWCWallets);
     if (removedWCWallets.length) {
       updateWCStorageIds(original =>
         original.filter(v => !removedWCWallets.includes(v))
@@ -91,7 +114,6 @@ const useWalletConnect = (): [Wallet[], () => Promise<void>] => {
   const wallets = wcWallets.filter(
     ({ missingConnection }) => !missingConnection
   ) as Wallet[];
-  console.log('remainingWallets', wallets);
 
   return [wallets, connectToWalletConnect];
 };

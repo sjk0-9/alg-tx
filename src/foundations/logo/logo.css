@@ -6,11 +6,15 @@
     font-family: 'Baloo Da 2';
     @apply 
       select-none
-      text-xl
       bg-clip-text text-transparent
-      bg-gradient-to-br from-teal-900 to-teal-600
-      transition-all
-      duration-500
-      motion-reduce:transition-none
+      bg-gradient-to-br from-teal-900 to-teal-600;
+  }
+
+  .logo-md {
+    @apply text-xl;
+  }
+
+  .logo-lg {
+    @apply text-4xl;
   }
 }

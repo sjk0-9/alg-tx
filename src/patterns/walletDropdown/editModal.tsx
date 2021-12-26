@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ExternalLinkIcon } from '@heroicons/react/solid';
 import Dialog from '../../components/Dialog';
 import '../../components/css/button.css';
@@ -11,6 +11,8 @@ import {
 import AddressBox from '../AddressBox';
 import { Label, TextInput } from '../../components/form';
 import { InlineWrapper } from '../../components/form/wrappers';
+import { NetworkContext } from '../../contexts';
+import ExternalLink from '../../components/ExternalLink';
 
 const EditWalletDialog = ({
   open,
@@ -24,12 +26,19 @@ const EditWalletDialog = ({
   const [newWalletName, setNewWalletName] = useState<string | undefined>(
     undefined
   );
+  const network = useContext(NetworkContext);
   // When switching or updating wallets, reset the name updates
   useEffect(() => {
     setNewWalletName(undefined);
   }, [wallet?.id]);
 
   const inputValue = newWalletName ?? (wallet?.name || '');
+
+  const algoexplorerUrl =
+    network === 'mainnet'
+      ? `https://algoexplorer.io/address/${wallet?.address || ''}`
+      : `https://testnet.algoexplorer.io/address/${wallet?.address || ''}`;
+
   return (
     <Dialog
       open={open}
@@ -39,15 +48,18 @@ const EditWalletDialog = ({
         wallet && walletName(wallet)
       }`}
     >
-      <a
-        href={`https://algoexplorer.io/address/${wallet?.address || ''}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex my-2 w-min"
-      >
-        AlgoExplorer
-        <ExternalLinkIcon className="w-5 h-5" />
-      </a>
+      <div className="flex flex-row gap-2">
+        <ExternalLink to={algoexplorerUrl}>AlgoExplorer</ExternalLink>
+        {network === 'testnet' && (
+          <ExternalLink
+            to={`https://bank.testnet.algorand.network/?account=${
+              wallet?.address || ''
+            }`}
+          >
+            Testnet Faucet
+          </ExternalLink>
+        )}
+      </div>
       <p className="my-1">Wallet Type: {wallet && prettyWalletType(wallet)}</p>
       <div className="my-1">
         Address: <AddressBox address={wallet?.address || ''} />

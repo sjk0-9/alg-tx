@@ -4,6 +4,7 @@ import '../../components/css/button.css';
 import { Wallet } from '../../hooks/useWallets/types';
 import { walletName } from '../../lib/helpers/wallet';
 import AddressBox from '../AddressBox';
+import ExternalLink from '../../components/ExternalLink';
 
 const WalletConnectDisconnectText = () => (
   <>
@@ -22,14 +23,9 @@ const MyAlgoDisconnectText = () => (
     </p>
     <p className="my-2">
       To disconnect My Algo from brx, visit{' '}
-      <a
-        href="https://wallet.myalgo.com/settings"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-primary hover:text-primary-h"
-      >
+      <ExternalLink to="https://wallet.myalgo.com/settings">
         My Algo Settings
-      </a>{' '}
+      </ExternalLink>{' '}
       and remove brx from &quot;Connected Sites&quot;.
     </p>
   </>

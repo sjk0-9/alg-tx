@@ -19,4 +19,12 @@ const TextInput = (props: Omit<React.HTMLProps<HTMLInputElement>, 'type'>) => (
   />
 );
 
-export { Label, TextInput };
+const Checkbox = (props: Omit<React.HTMLProps<HTMLInputElement>, 'type'>) => (
+  <input
+    type="checkbox"
+    className={mergeClassName('text-input', props)}
+    {...props}
+  />
+);
+
+export { Label, TextInput, Checkbox };

@@ -22,6 +22,7 @@
 
   .menu-dropdown {
     @apply
+      z-10
       py-2
       mt-2
       bg-grey-50

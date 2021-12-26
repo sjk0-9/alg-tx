@@ -1,27 +1,57 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import createPersistedState from 'use-persisted-state';
+import { DISCLAIMER_VERSION } from '../../patterns/DisclaimerModal';
 import usePrevious from '../usePrevious';
 import useMyAlgoConnect from './myAlgo';
-import { Connectors, Wallet } from './types';
+import { Connectors, SignType, Wallet } from './types';
 import useWalletConnect from './walletConnect';
+import { useActiveWallet } from './WalletProvider';
+
+const useAcceptedLicenseVersion = createPersistedState(
+  'acceptedLicenseVersion'
+);
+
+type AcceptedLicenseVersionType =
+  | {
+      acceptedVersion?: string;
+      doNotShowAgain?: boolean;
+    }
+  | undefined;
 
 type UseWalletsType = {
   activeWallet?: Wallet;
   setActiveWallet: (wallet: Wallet | number | undefined) => void;
   wallets: Wallet[];
   connectors: Connectors;
+  licenseCheck: AcceptedLicenseVersionType;
+  setLicenseCheck: (v: AcceptedLicenseVersionType) => void;
 };
+
+const checkForLicenseAgreement =
+  (sign: SignType, licenseCheck: AcceptedLicenseVersionType): SignType =>
+  async (...args) => {
+    if (licenseCheck?.acceptedVersion !== DISCLAIMER_VERSION) {
+      throw new Error('User has not accepted terms and conditions');
+    }
+    return sign(...args);
+  };
 
 const useWallets = (): UseWalletsType => {
   const [wcWallets, wcConnector] = useWalletConnect();
   const [maWallets, maConnector] = useMyAlgoConnect();
-  const [activeWallet, setActiveWallet] = useState<Wallet | undefined>();
+  const [activeWallet, setActiveWallet] = useActiveWallet();
+  const [licenseCheck, setLicenseCheck] =
+    useAcceptedLicenseVersion<AcceptedLicenseVersionType>();
 
   const connectors = {
     walletConnect: wcConnector,
     myAlgo: maConnector,
   };
 
-  const wallets = [...wcWallets, ...maWallets];
+  const wallets = [...wcWallets, ...maWallets].map(wallet => ({
+    ...wallet,
+    sign: checkForLicenseAgreement(wallet.sign, licenseCheck),
+  }));
 
   const walletAddresses = wallets.map(w => w.address);
   const previousWallets = usePrevious<string[]>(walletAddresses);
@@ -65,6 +95,8 @@ const useWallets = (): UseWalletsType => {
     },
     wallets,
     connectors,
+    licenseCheck,
+    setLicenseCheck,
   };
 };
 

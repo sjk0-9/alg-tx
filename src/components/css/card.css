@@ -7,4 +7,11 @@
       p-6
       bg-white rounded-md drop-shadow-sm;
   }
+
+  .main-card {
+    @apply
+      card
+      my-6 mx-2 sm:mx-6
+      w-full sm:max-w-screen-sm;
+  }
 }
