@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Navigate, Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { SWRConfig } from 'swr';
 import { isFinite } from 'lodash';
@@ -9,8 +9,8 @@ import AssetSearchBar from './assetSearch';
 import useWallets from '../../../hooks/useWallets';
 import signAndPublishOptInTransaction from './transaction';
 import { NetworkContext } from '../../../contexts';
-import WrappedSpinner from '../../../foundations/spinner/wrapped';
 import PublishButton from '../../../patterns/PublishButton';
+import useDocumentTitle from '../../../hooks/useTitle';
 
 /**
  * A shortcut to allow people to remove the
@@ -21,6 +21,7 @@ export const RedirectOptIn = () => {
 };
 
 const OptIn = () => {
+  useDocumentTitle('Opt-In');
   const [searchParams, setSearchParams] = useSearchParams();
   const { activeWallet } = useWallets();
   const network = useContext(NetworkContext);

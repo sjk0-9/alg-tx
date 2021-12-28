@@ -5,6 +5,7 @@ import { Wallet } from '../../hooks/useWallets/types';
 import { walletName } from '../../lib/helpers/wallet';
 import AddressBox from '../AddressBox';
 import ExternalLink from '../../components/ExternalLink';
+import { NAME } from '../../lib/helpers/names';
 
 const WalletConnectDisconnectText = () => (
   <>
@@ -18,15 +19,15 @@ const WalletConnectDisconnectText = () => (
 const MyAlgoDisconnectText = () => (
   <>
     <p className="my-2">
-      This will remove the wallet from brx&apos;s wallet list, though My Algo
+      This will remove the wallet from {NAME}&apos;s wallet list, though My Algo
       will still track it.
     </p>
     <p className="my-2">
-      To disconnect My Algo from brx, visit{' '}
+      To disconnect My Algo from {NAME}, visit{' '}
       <ExternalLink to="https://wallet.myalgo.com/settings">
         My Algo Settings
       </ExternalLink>{' '}
-      and remove brx from &quot;Connected Sites&quot;.
+      and remove {NAME} from &quot;Connected Sites&quot;.
     </p>
   </>
 );

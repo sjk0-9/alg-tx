@@ -22,9 +22,9 @@ const Disclaimer = ({ onCancel, onAccept, isOpen }: DisclaimerProps) => {
       description="Agree to terms and conditions"
     >
       <p className="my-2">
-        This product is in early Alpha. It is by no means stable. It may change
-        at any time. Features may be added or removed. Braking changes may
-        occur.
+        This product is in early Alpha. It is by no means stable. It may contain
+        bugs. It may change at any time. Features may be added or removed.
+        Braking changes may occur.
       </p>
       <p className="my-2">
         By using the product you agree that you understand the nature and risks
@@ -61,6 +61,18 @@ const Disclaimer = ({ onCancel, onAccept, isOpen }: DisclaimerProps) => {
             <span>Don&apos;t ask again.</span>
           </Label>
         </InlineWrapper>
+      </div>
+      <div className="flex flex-row justify-end mt-4 gap-2">
+        <button onClick={onCancel} className="btn-secondary">
+          Cancel
+        </button>
+        <button
+          disabled={!agree}
+          className="btn-primary w-28"
+          onClick={() => onAccept(doNotShow)}
+        >
+          Agree
+        </button>
       </div>
     </Dialog>
   );

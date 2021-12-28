@@ -22,7 +22,7 @@ const TextInput = (props: Omit<React.HTMLProps<HTMLInputElement>, 'type'>) => (
 const Checkbox = (props: Omit<React.HTMLProps<HTMLInputElement>, 'type'>) => (
   <input
     type="checkbox"
-    className={mergeClassName('text-input', props)}
+    className={mergeClassName('checkbox-input', props)}
     {...props}
   />
 );

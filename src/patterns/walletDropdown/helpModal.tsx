@@ -1,6 +1,7 @@
 import React from 'react';
 import Dialog from '../../components/Dialog';
 import '../../components/css/button.css';
+import { NAME } from '../../lib/helpers/names';
 
 const HelpDialog = ({
   open,
@@ -32,7 +33,7 @@ const HelpDialog = ({
     <p className="py-1">
       In the pop-up window, before you log in, select &quot;Manage
       Accounts&quot;. Then log in, and select which accounts you want attached
-      to brx.
+      to {NAME}.
     </p>
     <button
       className="float-right w-24 btn-secondary"

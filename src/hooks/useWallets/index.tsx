@@ -30,7 +30,14 @@ type UseWalletsType = {
 const checkForLicenseAgreement =
   (sign: SignType, licenseCheck: AcceptedLicenseVersionType): SignType =>
   async (...args) => {
-    if (licenseCheck?.acceptedVersion !== DISCLAIMER_VERSION) {
+    let lc: AcceptedLicenseVersionType = licenseCheck;
+    // Manually check local storage because it may not have refreshed in the
+    // hook.
+    const storageLicenseCheck = localStorage.getItem('acceptedLicenseVersion');
+    if (storageLicenseCheck) {
+      lc = JSON.parse(storageLicenseCheck);
+    }
+    if (lc?.acceptedVersion !== DISCLAIMER_VERSION) {
       throw new Error('User has not accepted terms and conditions');
     }
     return sign(...args);

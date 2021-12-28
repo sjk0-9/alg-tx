@@ -2,13 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import ExternalLink from '../../components/ExternalLink';
 import Logo from '../../foundations/logo';
+import { NAME } from '../../lib/helpers/names';
 
 const Home = () => (
   <div className="main-card">
     <div className="flex justify-center my-6">
       <Logo size="lg" />
     </div>
-    <p className="my-2">Welcome to brx.algo.</p>
+    <p className="my-2">Welcome to {NAME}.</p>
     <p className="my-2">
       This dapp is currently in very early alpha. There is a lot of work to do,
       and a lot of stuff that probably doesn&apos;t work quite right.

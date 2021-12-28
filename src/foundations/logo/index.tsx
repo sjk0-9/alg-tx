@@ -1,4 +1,5 @@
 import React from 'react';
+import { SITE } from '../../lib/helpers/names';
 import './logo.css';
 
 type LogoProps = {
@@ -11,7 +12,7 @@ const sizeClass = {
 };
 
 const Logo = ({ size = 'md' }: LogoProps) => (
-  <div className={`logo ${sizeClass[size]}`}>brx.algo</div>
+  <div className={`logo ${sizeClass[size]}`}>{SITE}</div>
 );
 
 export default Logo;

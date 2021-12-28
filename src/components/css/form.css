@@ -27,12 +27,26 @@
     @apply
       my-2
       gap-2
-      flex flex-row;
+      flex flex-row items-center;
   }
 
   .inline-wrapper label {
     @apply
       whitespace-nowrap
       w-min;
+  }
+
+  .inline-wrapper .form-label {
+    @apply
+      pt-0 pb-0
+  }
+
+  .checkbox-input {
+    @apply
+      mr-2;
+  }
+  .checkbox-input input {
+    @apply
+      checked:bg-primary
   }
 }

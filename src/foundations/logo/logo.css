@@ -7,7 +7,7 @@
     @apply 
       select-none
       bg-clip-text text-transparent
-      bg-gradient-to-br from-teal-900 to-teal-600;
+      bg-gradient-to-br from-teal-900 to-teal-500;
   }
 
   .logo-md {

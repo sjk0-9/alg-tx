@@ -53,6 +53,9 @@ const PublishButton = ({ onClick, disabled, text }: PublishButtonProps) => {
       />
       <button
         onClick={async () => {
+          if (isPublishing) {
+            return;
+          }
           if (
             canPublish &&
             licenseCheck?.acceptedVersion === DISCLAIMER_VERSION &&
