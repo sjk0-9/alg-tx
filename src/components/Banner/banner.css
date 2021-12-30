@@ -1,0 +1,36 @@
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .banner {
+    @apply
+      w-full
+      py-2 px-4
+      rounded-md
+      border;
+  }
+
+  .banner-error {
+    @apply
+      banner
+      bg-red-200
+      border-red-700;
+  }
+
+  .banner-warning {
+    @apply
+      banner
+      bg-yellow-200
+      border-yellow-700;
+  }
+
+  .banner-sm {
+    @apply
+      text-sm;
+  }
+
+  .banner-sm h3 {
+    @apply
+      text-base;
+  }
+}

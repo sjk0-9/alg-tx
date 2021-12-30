@@ -1,15 +1,38 @@
 import MyAlgoConnect, { Accounts } from '@randlabs/myalgo-connect';
+import algosdk from 'algosdk';
 import createPersistedState from 'use-persisted-state';
+import { isSigned } from '../../lib/algo/transactions';
 import { TxToSign, Wallet } from './types';
 
 const useMyAlgoWallets = createPersistedState('myAlgoWallets');
 const myAlgoConnect = new MyAlgoConnect();
 
 const sign = async (transactions: TxToSign[]) => {
-  const toSign = transactions.map(({ txn }) => txn.toByte());
+  const toSign = transactions
+    .filter(({ viewOnly }) => !viewOnly)
+    .map(({ txn }) => txn.toByte());
   const signedTxns = await myAlgoConnect.signTransaction(toSign);
   const parsedTxns = signedTxns.map(({ blob }) => blob);
-  return parsedTxns;
+
+  const mergedTxns = transactions.reduce(
+    ({ signedIdx, txns }, { txn, viewOnly }) => {
+      if (viewOnly) {
+        let encodedTxn: Uint8Array;
+        if (isSigned(txn)) {
+          encodedTxn = algosdk.encodeObj(txn);
+        } else {
+          encodedTxn = algosdk.encodeUnsignedTransaction(txn);
+        }
+        return { signedIdx, txns: [...txns, encodedTxn] };
+      }
+      return {
+        signedIdx: signedIdx + 1,
+        txns: [...txns, parsedTxns[signedIdx]],
+      };
+    },
+    { signedIdx: 0, txns: [] } as { signedIdx: number; txns: Uint8Array[] }
+  );
+  return mergedTxns.txns;
 };
 
 const useMyAlgoConnect = (): [Wallet[], () => Promise<void>] => {

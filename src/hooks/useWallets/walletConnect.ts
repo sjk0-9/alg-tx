@@ -34,13 +34,14 @@ const createNewConnector = async (): Promise<[string, WalletConnect]> => {
 };
 
 const sign = (connector: WalletConnect) => async (txs: TxToSign[]) => {
-  const txnWithbuffers = txs.map(({ txn, message }) => {
+  const txnWithbuffers = txs.map(({ txn, viewOnly, message }) => {
     const encodedTxn = Buffer.from(
       algosdk.encodeUnsignedTransaction(txn)
     ).toString('base64');
 
     return {
       txn: encodedTxn,
+      signers: viewOnly ? [] : undefined,
       message,
     };
   });

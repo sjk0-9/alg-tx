@@ -1,18 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ExternalLinkIcon } from '@heroicons/react/solid';
 import Dialog from '../../components/Dialog';
 import '../../components/css/button.css';
 import { Wallet } from '../../hooks/useWallets/types';
-import {
-  walletName,
-  prettyWalletType,
-  shortenAddress,
-} from '../../lib/helpers/wallet';
+import { walletName, prettyWalletType } from '../../lib/helpers/wallet';
 import AddressBox from '../AddressBox';
 import { Label, TextInput } from '../../components/form';
 import { InlineWrapper } from '../../components/form/wrappers';
 import { NetworkContext } from '../../contexts';
 import ExternalLink from '../../components/ExternalLink';
+import { shortenAddress } from '../../lib/algo/address';
 
 const EditWalletDialog = ({
   open,

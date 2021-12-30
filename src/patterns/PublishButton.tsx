@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import WrappedSpinner from '../foundations/spinner/wrapped';
 import useWallets from '../hooks/useWallets';
+import { Wallet } from '../hooks/useWallets/types';
+import { walletName } from '../lib/helpers/wallet';
 import Disclaimer, { DISCLAIMER_VERSION } from './DisclaimerModal';
 
 type PublishButtonProps = {
@@ -9,7 +11,11 @@ type PublishButtonProps = {
   text?: string;
 };
 
-const signButtonTxt = (otherText: string | undefined, hasWallet: boolean) => {
+const signButtonTxt = (
+  otherText: string | undefined,
+  activeWallet?: Wallet
+) => {
+  const hasWallet = activeWallet !== undefined;
   if (otherText) {
     return otherText;
   }
@@ -17,7 +23,7 @@ const signButtonTxt = (otherText: string | undefined, hasWallet: boolean) => {
     return 'Connect your wallet to sign the transaction';
   }
 
-  return 'Sign Transaction';
+  return `Sign Transaction with ${walletName(activeWallet)}`;
 };
 
 const PublishButton = ({ onClick, disabled, text }: PublishButtonProps) => {
@@ -70,7 +76,7 @@ const PublishButton = ({ onClick, disabled, text }: PublishButtonProps) => {
         className="btn-primary w-full mt-4"
       >
         <WrappedSpinner loading={isPublishing}>
-          {signButtonTxt(text, hasWallet)}
+          {signButtonTxt(text, activeWallet)}
         </WrappedSpinner>
       </button>
     </>

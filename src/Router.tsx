@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import App from './App';
 import { Networks } from './lib/algo/clients';
+import AtomicTransfer from './pages/atomicTransfer';
 import hardcodedRouteList from './pages/hardcoded/Router';
 import Home from './pages/home';
 
@@ -23,6 +24,7 @@ const Router = () => (
         >
           <Route index element={<Home />} />
           <Route path="h">{hardcodedRouteList()}</Route>
+          <Route path="a" element={<AtomicTransfer />} />
         </Route>
       ))}
     </Routes>

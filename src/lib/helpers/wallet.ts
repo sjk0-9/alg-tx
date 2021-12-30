@@ -1,4 +1,5 @@
 import { Wallet } from '../../hooks/useWallets/types';
+import { shortenAddress } from '../algo/address';
 
 export const prettyWalletType = (wallet: Wallet) => {
   switch (wallet.type) {
@@ -11,9 +12,6 @@ export const prettyWalletType = (wallet: Wallet) => {
       throw new Error(`Unknown wallet type ${wallet.type}`);
   }
 };
-
-export const shortenAddress = (address: string) =>
-  `${address.slice(0, 6)}...${address.slice(54)}`;
 
 export const walletName = (wallet: Wallet) => {
   if (wallet.name) {

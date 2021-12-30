@@ -5,7 +5,7 @@
   .card {
     @apply 
       p-6
-      bg-white rounded-md drop-shadow-sm;
+      bg-white rounded-md drop-shadow;
   }
 
   .main-card {
@@ -13,5 +13,24 @@
       card
       my-6 mx-2 sm:mx-6
       w-full sm:max-w-screen-sm;
+  }
+
+  .expandable-card {
+    @apply
+      bg-white rounded-md drop-shadow;
+  }
+
+  .expandable-card .header {
+    @apply
+      p-6 pb-2;
+  }
+  
+  .expandable-card .bottom {
+    @apply
+      p-4 pt-4
+      shadow-inner
+      bg-grey-100
+      rounded-b-md
+      ;
   }
 }

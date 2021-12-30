@@ -7,10 +7,11 @@
   </defs>
   <mask id="mask">
    <rect height="300" width="300" y="0" x="0" fill="black" />
-   <rect stroke-opacity="0" rx="6" id="svg_2" height="95" width="95" y="206.49999" x="0" stroke="#0f0f00" fill="white" />
-   <rect stroke-opacity="0" rx="6" id="svg_3" height="95" width="197" y="206.49999" x="103.49999" stroke="#0f0f00" fill="white" />
-   <rect stroke-opacity="0" rx="6" id="svg_5" height="95" width="95" y="102.99999" x="103.5" stroke="#0f0f00" fill="white" />
-   <rect stroke-opacity="0" rx="6" id="svg_1" height="198" width="95" y="0" x="206" stroke="#0f0f00" fill="white" />
+   <rect stroke-opacity="0" rx="10" id="svg_2" height="90" width="90" y="210" x="0" stroke="#0f0f00" fill="white" />
+   <rect stroke-opacity="0" rx="10" id="svg_3" height="90" width="195" y="210" x="105" stroke="#0f0f00" fill="white" />
+   <rect stroke-opacity="0" rx="10" id="svg_5" height="90" width="90" y="105" x="105" stroke="#0f0f00" fill="white" />
+   <rect stroke-opacity="0" rx="10" id="svg_1" height="195" width="90" y="0" x="210" stroke="#0f0f00" fill="white" />
   </mask>
   <rect height="300" width="300" y="0" x="0" fill="url(#Gradient)" mask="url(#mask)"/>
 </svg>
+
