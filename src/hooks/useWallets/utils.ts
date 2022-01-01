@@ -1,5 +1,11 @@
-import { Wallet } from '../../hooks/useWallets/types';
-import { shortenAddress } from '../algo/address';
+import { Address } from 'algosdk';
+import { shortenAddress, stringAddress } from '../../lib/algo/address';
+import { Wallet } from './types';
+
+export const findWallet = (address: string | Address, wallets: Wallet[]) => {
+  const sAddress = stringAddress(address);
+  return wallets.find(wallet => wallet.address === sAddress);
+};
 
 export const prettyWalletType = (wallet: Wallet) => {
   switch (wallet.type) {

@@ -11,6 +11,7 @@ import { encodeSignedTransaction, isSigned } from '../../lib/algo/transactions';
 import { TxToSign, Wallet } from './types';
 
 const useWCStorageIds = createPersistedState('walletConnectStorageIds');
+const useWCWalletNames = createPersistedState('walletConnectNames');
 
 const createNewConnector = async (): Promise<[string, WalletConnect]> => {
   const storageId = `walletConnect:${uuid.v4()}`;
@@ -81,6 +82,9 @@ const sign =
 
 const useWalletConnect = (): [Wallet[], () => Promise<void>] => {
   const [WCStorageIds, updateWCStorageIds] = useWCStorageIds<string[]>([]);
+  const [WCNames, updateWCNames] = useWCWalletNames<{
+    [storageId: string]: string | undefined;
+  }>({});
   const [WCInstances, updateWCInstances] = useState<{
     [storageId: string]: WalletConnect;
   }>({});
@@ -118,8 +122,12 @@ const useWalletConnect = (): [Wallet[], () => Promise<void>] => {
         connector.killSession();
         updateWCStorageIds(original => original.filter(v => v !== storageId));
       },
+      name: WCNames[storageId],
       type: 'WalletConnect',
       connector,
+      setName: (name: string | undefined) => {
+        updateWCNames(names => ({ ...names, [storageId]: name }));
+      },
     };
   });
 

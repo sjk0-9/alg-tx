@@ -20,9 +20,11 @@ const signer = ({ transaction }: SignedTransactionCardProps) => {
 const SignedTransactionCard = ({ transaction }: SignedTransactionCardProps) => (
   <div className="expandable-card bg-grey-50">
     <div className="header">
-      <h3 className="mb-2">Signed {friendlyTypeName(transaction.txn.type)}</h3>
+      <h5 className="mb-2 text-subtle">
+        Signed {friendlyTypeName(transaction.txn.type)}
+      </h5>
       <TransactionCardContent transaction={transaction} />
-      <div className="text-sm text-subtle">
+      <div className="text-sm text-subtle mt-2">
         Signed by: {signer({ transaction })}
       </div>
       <TransactionWarnings transaction={transaction.txn} />

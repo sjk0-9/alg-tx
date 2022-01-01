@@ -12,7 +12,7 @@ type TransactionCardProps = {
 const TransactionCard = ({ transaction }: TransactionCardProps) => (
   <div className="expandable-card">
     <div className="header">
-      <h3 className="mb-2">{friendlyTypeName(transaction.type)}</h3>
+      <h5 className="mb-2 text-subtle">{friendlyTypeName(transaction.type)}</h5>
       <TransactionCardContent transaction={transaction} />
       <TransactionWarnings transaction={transaction} />
     </div>

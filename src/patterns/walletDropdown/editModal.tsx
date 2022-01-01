@@ -2,22 +2,24 @@ import React, { useContext, useEffect, useState } from 'react';
 import Dialog from '../../components/Dialog';
 import '../../components/css/button.css';
 import { Wallet } from '../../hooks/useWallets/types';
-import { walletName, prettyWalletType } from '../../lib/helpers/wallet';
 import AddressBox from '../AddressBox';
 import { Label, TextInput } from '../../components/form';
 import { InlineWrapper } from '../../components/form/wrappers';
 import { NetworkContext } from '../../contexts';
 import ExternalLink from '../../components/ExternalLink';
 import { shortenAddress } from '../../lib/algo/address';
+import { prettyWalletType, walletName } from '../../hooks/useWallets/utils';
 
 const EditWalletDialog = ({
   open,
   wallet,
   onClose,
+  onDisconnect,
 }: {
   open: boolean;
   wallet?: Wallet;
   onClose: () => void;
+  onDisconnect: () => void;
 }) => {
   const [newWalletName, setNewWalletName] = useState<string | undefined>(
     undefined
@@ -70,10 +72,24 @@ const EditWalletDialog = ({
         />
       </InlineWrapper>
       <div className="flex flex-row justify-between gap-2 mt-2">
-        <button className="btn-danger">Disconnect</button>
+        <button className="btn-danger" onClick={onDisconnect}>
+          Disconnect
+        </button>
         <div className="flex-grow" />
-        <button className="btn-secondary">Cancel</button>
-        <button className="btn-primary w-32">Save</button>
+        <button className="btn-secondary" onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          className="btn-primary w-32"
+          onClick={() => {
+            if (newWalletName !== undefined) {
+              wallet?.setName(newWalletName);
+            }
+            onClose();
+          }}
+        >
+          Save
+        </button>
       </div>
     </Dialog>
   );

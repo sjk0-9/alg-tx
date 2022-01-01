@@ -2,10 +2,10 @@ import React from 'react';
 import Dialog from '../../components/Dialog';
 import '../../components/css/button.css';
 import { Wallet } from '../../hooks/useWallets/types';
-import { walletName } from '../../lib/helpers/wallet';
 import AddressBox from '../AddressBox';
 import ExternalLink from '../../components/ExternalLink';
 import { NAME } from '../../lib/helpers/names';
+import { walletName } from '../../hooks/useWallets/utils';
 
 const WalletConnectDisconnectText = () => (
   <>

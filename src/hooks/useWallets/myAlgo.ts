@@ -5,6 +5,7 @@ import { encodeSignedTransaction, isSigned } from '../../lib/algo/transactions';
 import { TxToSign, Wallet } from './types';
 
 const useMyAlgoWallets = createPersistedState('myAlgoWallets');
+const useMyAlgoNames = createPersistedState('myAlgoNames');
 const myAlgoConnect = new MyAlgoConnect();
 
 const sign = async (transactions: TxToSign[]) => {
@@ -37,6 +38,9 @@ const sign = async (transactions: TxToSign[]) => {
 
 const useMyAlgoConnect = (): [Wallet[], () => Promise<void>] => {
   const [myAlgoWallets, setMyAlgoWallets] = useMyAlgoWallets<Accounts[]>([]);
+  const [myAlgoNames, setMyAlgoNames] = useMyAlgoNames<{
+    [address: string]: string | undefined;
+  }>({});
 
   const connectToWallet = async () => {
     const wallets = await myAlgoConnect.connect();
@@ -48,12 +52,15 @@ const useMyAlgoConnect = (): [Wallet[], () => Promise<void>] => {
       ({
         id: `myalgo:${account.address}`,
         address: account.address,
-        name: account.name || undefined,
+        name: myAlgoNames[account.address] ?? (account.name || undefined),
         sign,
         disconnect: async () => {
           setMyAlgoWallets(original =>
             original.filter(a => a.address !== account.address)
           );
+        },
+        setName: (name: string | undefined) => {
+          setMyAlgoNames(names => ({ ...names, [account.address]: name }));
         },
         type: 'MyAlgo',
       } as Wallet)

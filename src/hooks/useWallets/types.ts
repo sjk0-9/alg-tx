@@ -27,6 +27,7 @@ export type Wallet = {
   name?: string;
   sign: SignType;
   disconnect: () => Promise<any>;
+  setName: (name: string | undefined) => void;
 } & (
   | {
       type: 'WalletConnect';

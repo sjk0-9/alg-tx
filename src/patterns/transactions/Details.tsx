@@ -122,16 +122,22 @@ const TransactionTable = ({
   signedTranasction,
 }: TransactionDetailsProps) => (
   <table className="border-collapse table-auto">
-    <tr>
-      <th className="text-left">Property</th>
-      <th className="text-left">Value</th>
-    </tr>
-    {transactionRows({ txn, signedTranasction }).map(({ property, value }) => (
-      <tr key={property}>
-        <td className="pr-2">{property}</td>
-        <td className="pr-2">{value}</td>
+    <thead>
+      <tr>
+        <th className="text-left">Property</th>
+        <th className="text-left">Value</th>
       </tr>
-    ))}
+    </thead>
+    <tbody>
+      {transactionRows({ txn, signedTranasction }).map(
+        ({ property, value }) => (
+          <tr key={property}>
+            <td className="pr-2">{property}</td>
+            <td className="pr-2">{value}</td>
+          </tr>
+        )
+      )}
+    </tbody>
   </table>
 );
 

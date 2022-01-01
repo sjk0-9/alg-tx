@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import WrappedSpinner from '../foundations/spinner/wrapped';
 import useWallets from '../hooks/useWallets';
 import { Wallet } from '../hooks/useWallets/types';
-import { walletName } from '../lib/helpers/wallet';
+import { walletName } from '../hooks/useWallets/utils';
 import Disclaimer, { DISCLAIMER_VERSION } from './DisclaimerModal';
 
 type PublishButtonProps = {

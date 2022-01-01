@@ -18,6 +18,8 @@ import {
   correctAssetDenomination,
   formatAssetName,
 } from '../../lib/algo/asset';
+import useWallets from '../../hooks/useWallets';
+import { findWallet } from '../../hooks/useWallets/utils';
 
 type ContentProp<T> = {
   txn: T;
@@ -30,23 +32,27 @@ const AddressTransfer = ({
 }: {
   from: string | Address;
   to: string | Address;
-}) => (
-  <div className="flex items-center flex-nowrap gap-2">
-    {shortenAddress(from)} <ArrowNarrowRightIcon className="w-4 h-4" />
-    {shortenAddress(to)}
-  </div>
-);
+}) => {
+  const { wallets } = useWallets();
+  const parsedFrom = findWallet(from, wallets)?.name || shortenAddress(from);
+  const parsedTo = findWallet(to, wallets)?.name || shortenAddress(to);
+  return (
+    <div className="flex items-center flex-nowrap gap-2">
+      {parsedFrom} <ArrowNarrowRightIcon className="w-4 h-4" />
+      {parsedTo}
+    </div>
+  );
+};
 
 const PaymentTransactionContent = ({
   txn,
   signedTranasction,
 }: ContentProp<PaymentTxn>) => (
   <div>
-    <div className="flex gap-x-2 items-center flex-wrap">
-      <div className="whitespace-nowrap">
+    <div className="flex flex-col">
+      <div className="text-2xl whitespace-nowrap">
         {microalgosToAlgos(Number(txn.amount))} ALGO
       </div>
-      <span>-</span>
       <AddressTransfer from={txn.from} to={txn.to} />
     </div>
   </div>
@@ -62,16 +68,15 @@ const AssetTransferContent = ({ txn }: ContentProp<AssetTransferTxn>) => {
   const asaDisplay = formatAssetName(txn.assetIndex, asset);
   const isOptIn = Number.isNaN(Number(txn.amount)) || Number(txn.amount) === 0;
   const display = isOptIn
-    ? 'Opt In to '
-    : `${correctAssetDenomination(txn.amount, asset)} of `;
+    ? 'Opt In'
+    : correctAssetDenomination(txn.amount, asset);
   return (
     <div>
-      <div className="flex gap-x-2 items-center flex-wrap">
-        <div className="whitespace-nowrap">
-          {display}
+      <div className="flex flex-col">
+        <div className="text-2xl whitespace-nowrap">{display}</div>
+        <div>
           <ExternalLink to={algoexplorerLink}>{asaDisplay.name}</ExternalLink>
         </div>
-        <span>-</span>
         <AddressTransfer
           from={txn.assetRevocationTarget || txn.from}
           to={txn.to}

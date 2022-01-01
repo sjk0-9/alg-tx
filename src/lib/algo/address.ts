@@ -1,11 +1,16 @@
 import { Address, encodeAddress } from 'algosdk';
 
-export const shortenAddress = (address: string | Address | Buffer): string => {
+export const stringAddress = (address: string | Address | Buffer): string => {
   if (typeof address === 'string') {
-    return `${address.slice(0, 6)}...${address.slice(54)}`;
+    return address;
   }
   if ('publicKey' in address) {
-    return shortenAddress(encodeAddress(address.publicKey));
+    return encodeAddress(address.publicKey);
   }
-  return shortenAddress(encodeAddress(address));
+  return encodeAddress(address);
+};
+
+export const shortenAddress = (address: string | Address | Buffer): string => {
+  const sAddress = stringAddress(address);
+  return `${sAddress.slice(0, 6)}...${sAddress.slice(54)}`;
 };

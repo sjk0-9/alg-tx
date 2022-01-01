@@ -6,7 +6,6 @@ import {
   ChevronUpIcon,
   ExternalLinkIcon,
   IdentificationIcon,
-  PencilIcon,
   PlusIcon,
   QuestionMarkCircleIcon,
   TrashIcon,
@@ -15,13 +14,13 @@ import {
 import { Link } from 'react-router-dom';
 import useWallets from '../../hooks/useWallets';
 import { Wallet } from '../../hooks/useWallets/types';
-import { walletName } from '../../lib/helpers/wallet';
 
 import DisconnectWalletDialog from './disconnectModal';
 import HelpDialog from './helpModal';
 import { NetworkContext } from '../../contexts';
 import { Networks } from '../../lib/algo/clients';
 import EditWalletDialog from './editModal';
+import { walletName } from '../../hooks/useWallets/utils';
 
 type MenuButtonProps = {
   activeWallet: Wallet;
@@ -59,7 +58,7 @@ const WalletRow = ({
   setActiveWallet,
   editWallet,
 }: WalletRowProps) => (
-  <div key={wallet.id} className="relative">
+  <div key={wallet.id} className="min-w-max relative">
     <Menu.Item>
       {({ active }) => (
         <div
@@ -188,6 +187,10 @@ const WalletDropdown = () => {
         open={showEditWallet}
         wallet={editWallet}
         onClose={() => setShowEditWallet(false)}
+        onDisconnect={() => {
+          setShowEditWallet(false);
+          setShowDisconnectWallet(true);
+        }}
       />
       <HelpDialog open={showHelp} onClose={() => setShowHelp(false)} />
       <Menu as="div" className="menu-wrapper">
@@ -217,6 +220,7 @@ const WalletDropdown = () => {
                         setActiveWallet={setActiveWallet}
                         editWallet={w => {
                           setEditWallet(w);
+                          setDisconnectWallet(w);
                           setShowEditWallet(true);
                         }}
                         disconnectWallet={w => {
