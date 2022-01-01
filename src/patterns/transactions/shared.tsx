@@ -13,6 +13,11 @@ import { shortenAddress } from '../../lib/algo/address';
 import { isSigned } from '../../lib/algo/transactions';
 import ExternalLink from '../../components/ExternalLink';
 import { NetworkContext } from '../../contexts';
+import { useAssetLookup } from '../../hooks/useAlgoIndexer';
+import {
+  correctAssetDenomination,
+  formatAssetName,
+} from '../../lib/algo/asset';
 
 type ContentProp<T> = {
   txn: T;
@@ -49,20 +54,22 @@ const PaymentTransactionContent = ({
 
 const AssetTransferContent = ({ txn }: ContentProp<AssetTransferTxn>) => {
   const network = useContext(NetworkContext);
+  const { asset } = useAssetLookup({ assetId: txn.assetIndex });
   const algoexplorerLink =
     network === 'mainnet'
       ? `https://algoexplorer.io/asset/${txn.assetIndex}`
       : `https://testnet.algoexplorer.io/asset/${txn.assetIndex}`;
+  const asaDisplay = formatAssetName(txn.assetIndex, asset);
   const isOptIn = Number.isNaN(Number(txn.amount)) || Number(txn.amount) === 0;
-  const display = isOptIn ? 'Opt In to ' : `${Number(txn.amount)} of `;
+  const display = isOptIn
+    ? 'Opt In to '
+    : `${correctAssetDenomination(txn.amount, asset)} of `;
   return (
     <div>
       <div className="flex gap-x-2 items-center flex-wrap">
         <div className="whitespace-nowrap">
           {display}
-          <ExternalLink to={algoexplorerLink}>
-            ASA #{txn.assetIndex}
-          </ExternalLink>
+          <ExternalLink to={algoexplorerLink}>{asaDisplay.name}</ExternalLink>
         </div>
         <span>-</span>
         <AddressTransfer

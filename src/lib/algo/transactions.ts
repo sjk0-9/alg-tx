@@ -1,4 +1,9 @@
-import { SignedTransaction, Transaction, TransactionType } from 'algosdk';
+import {
+  encodeObj,
+  SignedTransaction,
+  Transaction,
+  TransactionType,
+} from 'algosdk';
 
 export const isSigned = (
   t: Transaction | SignedTransaction
@@ -25,3 +30,9 @@ export const friendlyTypeName = (type: TransactionType | undefined) => {
       throw new Error('Unknown Transaction Type');
   }
 };
+
+export const encodeSignedTransaction = (txn: SignedTransaction) =>
+  encodeObj({
+    ...txn,
+    txn: txn.txn.get_obj_for_encoding(),
+  });

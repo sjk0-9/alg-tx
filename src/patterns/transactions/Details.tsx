@@ -74,7 +74,6 @@ const parseRowObject = (
   key: keyof Transaction,
   value: Transaction[keyof Transaction]
 ): string | undefined => {
-  console.log(value);
   if (typeof value === 'object' && 'publicKey' in value) {
     return encodeAddress(value.publicKey);
   }
@@ -104,7 +103,12 @@ const transactionRows = ({ txn, signedTranasction }: TransactionDetailsProps) =>
       case 'object':
         return { property, value: parseRowObject(property, value) };
       case 'function':
-        return { property, value: value.bind(txn)() };
+        try {
+          // @ts-ignore
+          return { property, value: value.bind(txn)() };
+        } catch (e) {
+          return undefined;
+        }
       default:
         return undefined;
     }

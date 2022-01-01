@@ -59,7 +59,7 @@ const WalletRow = ({
   setActiveWallet,
   editWallet,
 }: WalletRowProps) => (
-  <div key={wallet.address} className="relative">
+  <div key={wallet.id} className="relative">
     <Menu.Item>
       {({ active }) => (
         <div
@@ -212,7 +212,7 @@ const WalletDropdown = () => {
                   <div className="menu-item-section">
                     {wallets.map(wallet => (
                       <WalletRow
-                        key={wallet.address}
+                        key={wallet.id}
                         wallet={wallet}
                         setActiveWallet={setActiveWallet}
                         editWallet={w => {

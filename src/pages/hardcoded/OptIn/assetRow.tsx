@@ -1,25 +1,15 @@
 import { XIcon } from '@heroicons/react/outline';
 import React from 'react';
 import { useAssetLookup } from '../../../hooks/useAlgoIndexer';
-import { AssetType } from '../../../lib/algo/types';
+import { formatAssetName } from '../../../lib/algo/asset';
 
 type OptInAssetRowParams = {
   assetId: number;
   removeAsset: () => void;
 };
 
-const formatAssetName = (assetId: number, asset?: AssetType) => {
-  if (asset?.params?.name && asset?.params?.unitName) {
-    return { name: `${asset.params.name} (${asset.params.unitName})`, assetId };
-  }
-  if (asset?.params?.name || asset?.params?.unitName) {
-    return { name: asset.params.name || asset.params.unitName, assetId };
-  }
-  return { name: `Asset ID: ${assetId}` };
-};
-
 const OptInAssetRow = ({ assetId, removeAsset }: OptInAssetRowParams) => {
-  const { asset, isLoading, error } = useAssetLookup({ assetId });
+  const { asset } = useAssetLookup({ assetId });
 
   const assetName = formatAssetName(assetId, asset);
   return (

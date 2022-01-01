@@ -6,42 +6,62 @@ import {
 } from 'algosdk';
 import { useLocation } from 'react-router-dom';
 
+export type DecodedTransactions = {
+  txn: Transaction;
+  signed?: SignedTransaction;
+  raw: Uint8Array;
+};
+
 export type UseUrlTransactionDecoderReturn =
   | {
-      transactions: (SignedTransaction | Transaction)[];
+      transactions: DecodedTransactions[];
       error?: undefined;
+      watch: string;
     }
   | {
       transactions?: undefined;
       error: any;
+      watch: string;
     }
-  | { transactions?: undefined; error?: undefined };
+  | {
+      transactions?: undefined;
+      error?: undefined;
+      watch: string;
+    };
 
 const useUrlTransactionDecoder = (): UseUrlTransactionDecoderReturn => {
   const { hash } = useLocation();
 
   if (!hash) {
-    return {};
+    return { watch: 'NONE' };
   }
 
   const encodedTransactions = hash.split(';');
-  let decodedTransactions: (Transaction | SignedTransaction)[];
+  let decodedTransactions: DecodedTransactions[];
   try {
     decodedTransactions = encodedTransactions.map(etx => {
       const array = Uint8Array.from(Buffer.from(etx, 'base64'));
       try {
-        return decodeUnsignedTransaction(array);
+        const txn = decodeUnsignedTransaction(array);
+        return { txn, raw: array };
       } catch {
-        return decodeSignedTransaction(array);
+        const signed = decodeSignedTransaction(array);
+        return {
+          txn: signed.txn,
+          signed,
+          raw: array,
+        };
       }
     });
   } catch (e) {
     return {
       error: e,
+      watch: JSON.stringify(e),
     };
   }
   return {
     transactions: decodedTransactions,
+    watch: hash,
   };
 };
 

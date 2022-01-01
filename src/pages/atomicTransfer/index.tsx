@@ -1,26 +1,26 @@
-import { encodeAddress, SignedTransaction, Transaction } from 'algosdk';
-import React, { useContext } from 'react';
+import { encodeAddress } from 'algosdk';
+import React, { useContext, useEffect, useState } from 'react';
 import Banner from '../../components/Banner';
+import ExternalLink from '../../components/ExternalLink';
 import { NetworkContext } from '../../contexts';
 import useUrlTransactionDecoder, {
+  DecodedTransactions,
   UseUrlTransactionDecoderReturn,
 } from '../../hooks/useUrlTransactionDecoder';
 import useWallets from '../../hooks/useWallets';
-import { isSigned } from '../../lib/algo/transactions';
+import { Networks } from '../../lib/algo/clients';
 import { NAME } from '../../lib/helpers/names';
 import PublishButton from '../../patterns/PublishButton';
 import SignedTransactionCard from '../../patterns/transactions/SignedTransactionCard';
 import TransactionCard from '../../patterns/transactions/TransactionCard';
 import signAndPublishAtomicTransactions from './sign';
 
-const numberOfAddressesToSign = (
-  transactions: (Transaction | SignedTransaction)[]
-) => {
+const numberOfAddressesToSign = (transactions: DecodedTransactions[]) => {
   const allWallets: Set<string> = transactions.reduce((acc, tx) => {
-    if (isSigned(tx)) {
+    if (tx.signed) {
       return acc;
     }
-    acc.add(encodeAddress(tx.from.publicKey));
+    acc.add(encodeAddress(tx.txn.from.publicKey));
     return acc;
   }, new Set<string>());
   return allWallets.size;
@@ -29,7 +29,7 @@ const numberOfAddressesToSign = (
 const AtomicTransferError = ({
   transactions,
   error,
-}: UseUrlTransactionDecoderReturn) => {
+}: Pick<UseUrlTransactionDecoderReturn, 'transactions' | 'error'>) => {
   if (error || !transactions) {
     return 'Could not read transactions.';
   }
@@ -43,10 +43,33 @@ const AtomicTransferError = ({
   return undefined;
 };
 
+const getExternalLink = (
+  network: Networks,
+  { group, txId }: Awaited<ReturnType<typeof signAndPublishAtomicTransactions>>
+) => {
+  const baseUrl =
+    network === 'mainnet'
+      ? 'https://algoexplorer.io'
+      : 'https://testnet.algoexplorer.io';
+  if (group) {
+    return `${baseUrl}/tx/group/${group}`;
+  }
+  return `${baseUrl}/tx/${txId}`;
+};
+
 const AtomicTransfer = () => {
   const { activeWallet } = useWallets();
   const network = useContext(NetworkContext);
-  const { transactions, error } = useUrlTransactionDecoder();
+  const { transactions, error, watch } = useUrlTransactionDecoder();
+  const [result, setResult] = useState<
+    Awaited<ReturnType<typeof signAndPublishAtomicTransactions>> | undefined
+  >();
+
+  useEffect(() => {
+    // The URL has changed, so we should unset any saved transactions.
+    setResult(undefined);
+  }, [watch]);
+
   const errorMessage = AtomicTransferError({ transactions, error });
   return (
     <div className="main-card">
@@ -59,32 +82,42 @@ const AtomicTransfer = () => {
         ) : (
           <>
             {transactions!.map(t => {
-              if (isSigned(t)) {
+              if (t.signed) {
                 return (
                   <div key={t.txn.txID()} className="my-2">
-                    <SignedTransactionCard transaction={t} />
+                    <SignedTransactionCard transaction={t.signed} />
                   </div>
                 );
               }
               return (
-                <div key={t.txID()} className="my-2">
-                  <TransactionCard transaction={t} />
+                <div key={t.txn.txID()} className="my-2">
+                  <TransactionCard transaction={t.txn} />
                 </div>
               );
             })}
           </>
         )}
       </div>
-      <PublishButton
-        onClick={() =>
-          signAndPublishAtomicTransactions(
-            activeWallet!,
-            network,
-            transactions!
-          )
-        }
-        disabled={!!errorMessage}
-      />
+      {result ? (
+        <div className="mt-4 text-lg text-center">
+          Success!{' '}
+          <ExternalLink to={getExternalLink(network, result)}>
+            See transaction
+          </ExternalLink>
+        </div>
+      ) : (
+        <PublishButton
+          onClick={async () => {
+            const res = await signAndPublishAtomicTransactions(
+              activeWallet!,
+              network,
+              transactions!
+            );
+            setResult(res);
+          }}
+          disabled={!!errorMessage}
+        />
+      )}
     </div>
   );
 };

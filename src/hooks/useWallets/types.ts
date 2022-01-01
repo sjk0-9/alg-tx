@@ -1,15 +1,21 @@
 import WalletConnect from '@walletconnect/client';
-import { Transaction } from 'algosdk';
+import { SignedTransaction, Transaction } from 'algosdk';
 
-export type TxToSign = {
-  txn: Transaction;
-  /**
-   * this transaction isn't for signing
-   * (e.g. signed by someone else, or to be signed elsewhere)
-   */
-  viewOnly?: boolean;
-  message?: string;
-};
+export type TxToSign =
+  | {
+      txn: Transaction;
+      /**
+       * this transaction isn't for signing
+       * (e.g. signed by someone else, or to be signed elsewhere)
+       */
+      viewOnly?: boolean;
+      message?: string;
+    }
+  | {
+      txn: Transaction | SignedTransaction;
+      viewOnly: true;
+      message?: string;
+    };
 
 export type SignType = (
   transactions: TxToSign[]
