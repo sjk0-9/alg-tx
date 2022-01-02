@@ -23,8 +23,8 @@ const Router = () => (
           element={<App root={path} network={network} />}
         >
           <Route index element={<Home />} />
-          <Route path="h">{hardcodedRouteList()}</Route>
           <Route path="a" element={<AtomicTransfer />} />
+          {hardcodedRouteList()}
         </Route>
       ))}
     </Routes>

@@ -22,7 +22,7 @@ const Home = () => (
     <h3 className="my-2">Algorand Tools</h3>
     <ul className="list-disc list-inside">
       <li>
-        <Link to="h/opt-in">Bulk asset opt in</Link>
+        <Link to="./opt-in">Bulk asset opt in</Link>
       </li>
       <li>
         <span className="text-subtle">More coming soon</span>

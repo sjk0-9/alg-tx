@@ -66,9 +66,6 @@ const SearchBox = <T extends {} = {}>({
     items: options,
     inputValue: searchString,
     onInputValueChange: changes => {
-      if (changes.type !== '__input_change__') {
-        return;
-      }
       onSearchChange(changes.inputValue || '');
     },
     onSelectedItemChange: changes => {
