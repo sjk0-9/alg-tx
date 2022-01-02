@@ -4,7 +4,7 @@ import {
   SignedTransaction,
   Transaction,
 } from 'algosdk';
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export type DecodedTransactions = {
   txn: Transaction;
@@ -30,13 +30,13 @@ export type UseUrlTransactionDecoderReturn =
     };
 
 const useUrlTransactionDecoder = (): UseUrlTransactionDecoderReturn => {
-  const { hash } = useLocation();
+  const { '*': transactions } = useParams();
 
-  if (!hash) {
+  if (!transactions) {
     return { watch: 'NONE' };
   }
 
-  const encodedTransactions = hash.split(';');
+  const encodedTransactions = transactions.split(';');
   let decodedTransactions: DecodedTransactions[];
   try {
     decodedTransactions = encodedTransactions.map(etx => {
@@ -61,7 +61,7 @@ const useUrlTransactionDecoder = (): UseUrlTransactionDecoderReturn => {
   }
   return {
     transactions: decodedTransactions,
-    watch: hash,
+    watch: transactions,
   };
 };
 

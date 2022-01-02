@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 import App from './App';
 import { Networks } from './lib/algo/clients';
 import AtomicTransfer from './pages/atomicTransfer';
@@ -14,7 +14,7 @@ const networkSelectionRoutes = [
 ] as [string, Networks][];
 
 const Router = () => (
-  <BrowserRouter>
+  <HashRouter>
     <Routes>
       {networkSelectionRoutes.map(([path, network]) => (
         <Route
@@ -23,12 +23,12 @@ const Router = () => (
           element={<App root={path} network={network} />}
         >
           <Route index element={<Home />} />
-          <Route path="a" element={<AtomicTransfer />} />
+          <Route path="a/*" element={<AtomicTransfer />} />
           {hardcodedRouteList()}
         </Route>
       ))}
     </Routes>
-  </BrowserRouter>
+  </HashRouter>
 );
 
 export default Router;
