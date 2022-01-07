@@ -5,20 +5,20 @@ import WrappedSpinner from '../foundations/spinner/wrapped';
 import useWallets from '../hooks/useWallets';
 import { Wallet } from '../hooks/useWallets/types';
 import { walletName } from '../hooks/useWallets/utils';
-import {
-  isAlgoClientError,
-  ParsedAlgoClientError,
-} from '../lib/algo/errors/parseClientError';
+import { ParsedAlgoClientError } from '../lib/algo/errors/parseClientError';
+import { s } from '../lib/helpers/string';
 import Disclaimer, { DISCLAIMER_VERSION } from './DisclaimerModal';
 
 type PublishButtonProps = {
   onClick: () => Promise<void>;
+  qty?: number;
   disabled?: boolean;
   text?: string;
 };
 
 const signButtonTxt = (
   otherText: string | undefined,
+  qty?: number,
   activeWallet?: Wallet
 ) => {
   const hasWallet = activeWallet !== undefined;
@@ -28,11 +28,20 @@ const signButtonTxt = (
   if (!hasWallet) {
     return 'Connect your wallet to sign the transaction';
   }
-
+  if (qty !== undefined) {
+    return `Sign ${qty} ${s(qty, 'Transaction')} with ${walletName(
+      activeWallet
+    )}`;
+  }
   return `Sign Transaction with ${walletName(activeWallet)}`;
 };
 
-const PublishButton = ({ onClick, disabled, text }: PublishButtonProps) => {
+const PublishButton = ({
+  onClick,
+  disabled,
+  text,
+  qty,
+}: PublishButtonProps) => {
   const location = useLocation();
   const { activeWallet, licenseCheck, setLicenseCheck } = useWallets();
   const [showDisclaimer, setShowDisclaimer] = useState<boolean>(false);
@@ -100,7 +109,7 @@ const PublishButton = ({ onClick, disabled, text }: PublishButtonProps) => {
         className="btn-primary w-full mt-4"
       >
         <WrappedSpinner loading={isPublishing}>
-          {signButtonTxt(text, activeWallet)}
+          {signButtonTxt(text, qty, activeWallet)}
         </WrappedSpinner>
       </button>
     </>

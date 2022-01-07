@@ -27,7 +27,8 @@ export const formatAssetName = (assetId: number, asset?: AssetType) => {
     const shortName = computeShortName(name, asset?.params?.name);
     return { name, shortName, assetId };
   }
-  return { name: `Asset ID: ${assetId}` };
+  name = `Asset ID: ${assetId}`;
+  return { name, shortName: name };
 };
 
 export const correctAssetDenomination = (

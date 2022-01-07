@@ -1,6 +1,6 @@
 import { encodeAddress } from 'algosdk';
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import Banner from '../../components/Banner';
 import ExternalLink from '../../components/ExternalLink';
 import { NetworkContext } from '../../contexts';
@@ -9,6 +9,8 @@ import useUrlTransactionDecoder, {
   UseUrlTransactionDecoderReturn,
 } from '../../hooks/useUrlTransactionDecoder';
 import useWallets from '../../hooks/useWallets';
+import { Wallet } from '../../hooks/useWallets/types';
+import { stringAddress } from '../../lib/algo/address';
 import { Networks } from '../../lib/algo/clients';
 import { NAME } from '../../lib/helpers/names';
 import PublishButton from '../../patterns/PublishButton';
@@ -58,6 +60,24 @@ const getExternalLink = (
   return `${baseUrl}/tx/${txId}`;
 };
 
+const getDefaultSignableTransactions = (
+  transactions?: DecodedTransactions[],
+  wallet?: Wallet
+) => {
+  if (!transactions || !wallet) {
+    return new Set<number>();
+  }
+
+  const indexes = transactions
+    .map((tx, idx) => {
+      if (!tx.signed && stringAddress(tx.txn.from) === wallet.address) {
+        return idx;
+      }
+      return null;
+    })
+    .filter(v => v !== null) as number[];
+  return new Set<number>(indexes);
+};
 const AtomicTransfer = () => {
   const { activeWallet } = useWallets();
   const network = useContext(NetworkContext);
@@ -65,11 +85,29 @@ const AtomicTransfer = () => {
   const [result, setResult] = useState<
     Awaited<ReturnType<typeof signAndPublishAtomicTransactions>> | undefined
   >();
+  const [idxToSign, setIdxToSign] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     // The URL has changed, so we should unset any saved transactions.
     setResult(undefined);
   }, [watch]);
+
+  useEffect(() => {
+    setIdxToSign(getDefaultSignableTransactions(transactions, activeWallet));
+  }, [watch, activeWallet?.address]);
+
+  const setIndex = (idx: number) => (toSign: boolean) => {
+    if (toSign) {
+      setIdxToSign(new Set([...idxToSign, idx]));
+      toast('Set transaction to sign', { duration: 1500, id: 'setIdxToSign' });
+    } else {
+      setIdxToSign(new Set([...idxToSign].filter(i => i !== idx)));
+      toast('Set transaction to not sign', {
+        duration: 1500,
+        id: 'setIdxToSign',
+      });
+    }
+  };
 
   const errorMessage = AtomicTransferError({ transactions, error });
   return (
@@ -82,7 +120,7 @@ const AtomicTransfer = () => {
           </Banner>
         ) : (
           <>
-            {transactions!.map(t => {
+            {transactions!.map((t, idx) => {
               if (t.signed) {
                 return (
                   <div key={t.txn.txID()} className="my-2">
@@ -92,7 +130,12 @@ const AtomicTransfer = () => {
               }
               return (
                 <div key={t.txn.txID()} className="my-2">
-                  <TransactionCard transaction={t.txn} />
+                  <TransactionCard
+                    transaction={t.txn}
+                    signable
+                    willSign={idxToSign.has(idx)}
+                    setWillSign={setIndex(idx)}
+                  />
                 </div>
               );
             })}
@@ -116,7 +159,13 @@ const AtomicTransfer = () => {
             );
             setResult(res);
           }}
-          disabled={!!errorMessage}
+          disabled={!!errorMessage || idxToSign.size === 0}
+          text={
+            idxToSign.size === 0
+              ? 'Select at least one transaction to sign'
+              : undefined
+          }
+          qty={idxToSign.size}
         />
       )}
     </div>
