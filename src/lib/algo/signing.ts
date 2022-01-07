@@ -1,6 +1,7 @@
 import toast from 'react-hot-toast';
 import { TxToSign, Wallet } from '../../hooks/useWallets/types';
 import getClients, { Networks } from './clients';
+import parseClientError, { AlgoClientError } from './errors/parseClientError';
 import { waitForTx } from './wait';
 
 export const signWithToasts = async (
@@ -34,8 +35,15 @@ export const publishWithToasts = async (
   try {
     response = await algodClient.sendRawTransaction(signed).do();
   } catch (e) {
-    toast.error('No response from algo client', { id: toastId });
-    throw e;
+    const parsedError = parseClientError(e as AlgoClientError);
+    toast.error('Error from algo client', { id: toastId });
+    console.error(
+      parsedError.message,
+      parsedError.type,
+      parsedError.data,
+      JSON.stringify(parsedError.original)
+    );
+    throw parsedError;
   }
 
   toast.loading('Waiting for confirmation', { id: toastId });

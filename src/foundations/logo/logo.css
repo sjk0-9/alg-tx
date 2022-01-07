@@ -7,11 +7,12 @@
     @apply 
       select-none
       bg-clip-text text-transparent
-      bg-gradient-to-br from-teal-900 to-teal-500;
+      bg-gradient-to-br from-teal-900 to-teal-500
+      whitespace-nowrap;
   }
 
   .logo-md {
-    @apply text-xl;
+    @apply text-lg sm:text-xl;
   }
 
   .logo-lg {

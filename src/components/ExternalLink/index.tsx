@@ -1,5 +1,5 @@
-import { ExternalLinkIcon } from '@heroicons/react/solid';
 import React from 'react';
+import './externalLink.css';
 
 type ExternalLinkProps = {
   to: string;
@@ -12,11 +12,12 @@ const ExternalLink = ({ to, children, icon = true }: ExternalLinkProps) => (
     href={to}
     target="_blank"
     rel="noopener noreferrer"
-    className="inline-flex w-min whitespace-nowrap"
+    className="external-link"
   >
     {children}
-    {icon && <ExternalLinkIcon className="w-4 h-4" />}
   </a>
 );
 
+// {icon && <ExternalLinkIcon className="w-4 h-4" />}
+// className={`inline-flex w-min whitespace-nowrap after:content-['url("${ExternalLinkIcon}")']`}
 export default ExternalLink;

@@ -37,9 +37,16 @@ const AddressTransfer = ({
   const parsedFrom = findWallet(from, wallets)?.name || shortenAddress(from);
   const parsedTo = findWallet(to, wallets)?.name || shortenAddress(to);
   return (
-    <div className="flex items-center flex-nowrap gap-2">
-      {parsedFrom} <ArrowNarrowRightIcon className="w-4 h-4" />
-      {parsedTo}
+    <div className="flex flex-nowrap flex-col sm:flex-row sm:items-center sm:gap-2">
+      <div>
+        <span className="inline sm:hidden">From: </span> {parsedFrom}{' '}
+      </div>
+      <div className="hidden sm:block">
+        <ArrowNarrowRightIcon className="w-4 h-4" />
+      </div>
+      <div>
+        <span className="inline sm:hidden">To: </span> {parsedTo}
+      </div>
     </div>
   );
 };
@@ -72,10 +79,15 @@ const AssetTransferContent = ({ txn }: ContentProp<AssetTransferTxn>) => {
     : correctAssetDenomination(txn.amount, asset);
   return (
     <div>
-      <div className="flex flex-col">
+      <div className="flex flex-col over">
         <div className="text-2xl whitespace-nowrap">{display}</div>
-        <div>
+        <div className="hidden sm:block">
           <ExternalLink to={algoexplorerLink}>{asaDisplay.name}</ExternalLink>
+        </div>
+        <div className="block sm:hidden">
+          <ExternalLink to={algoexplorerLink}>
+            {asaDisplay.shortName}
+          </ExternalLink>
         </div>
         <AddressTransfer
           from={txn.assetRevocationTarget || txn.from}

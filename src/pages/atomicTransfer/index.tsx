@@ -1,5 +1,6 @@
 import { encodeAddress } from 'algosdk';
 import React, { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Banner from '../../components/Banner';
 import ExternalLink from '../../components/ExternalLink';
 import { NetworkContext } from '../../contexts';
@@ -52,7 +53,7 @@ const getExternalLink = (
       ? 'https://algoexplorer.io'
       : 'https://testnet.algoexplorer.io';
   if (group) {
-    return `${baseUrl}/tx/group/${group}`;
+    return `${baseUrl}/tx/group/${encodeURIComponent(group)}`;
   }
   return `${baseUrl}/tx/${txId}`;
 };

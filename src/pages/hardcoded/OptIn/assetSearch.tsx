@@ -44,7 +44,7 @@ const AssetSearchBar = ({ onSelect }: AssetSearchBarParams) => {
   const [searchString, setSearchString] = useState<string>('');
   const searchParams = getSearchParams(searchString);
 
-  const { assets = [], isLoading, error } = useAssetSearch(searchParams);
+  const { assets = [], isLoading } = useAssetSearch(searchParams);
 
   const options = assets.map(formatOption);
 

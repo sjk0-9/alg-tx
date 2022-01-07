@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import Banner from '../components/Banner';
 import WrappedSpinner from '../foundations/spinner/wrapped';
 import useWallets from '../hooks/useWallets';
 import { Wallet } from '../hooks/useWallets/types';
 import { walletName } from '../hooks/useWallets/utils';
+import {
+  isAlgoClientError,
+  ParsedAlgoClientError,
+} from '../lib/algo/errors/parseClientError';
 import Disclaimer, { DISCLAIMER_VERSION } from './DisclaimerModal';
 
 type PublishButtonProps = {
@@ -27,21 +33,32 @@ const signButtonTxt = (
 };
 
 const PublishButton = ({ onClick, disabled, text }: PublishButtonProps) => {
+  const location = useLocation();
   const { activeWallet, licenseCheck, setLicenseCheck } = useWallets();
   const [showDisclaimer, setShowDisclaimer] = useState<boolean>(false);
   const [isPublishing, setIsPublishing] = useState<boolean>(false);
+  const [error, setError] = useState<Error | undefined>();
   const hasWallet = activeWallet !== undefined;
 
   const canPublish = hasWallet && !disabled;
 
   const publish = async () => {
+    setError(undefined);
     setIsPublishing(true);
     try {
       await onClick();
+    } catch (e) {
+      console.log(error);
+      setError(e as Error);
     } finally {
       setIsPublishing(false);
     }
   };
+
+  // If something's changed, we might as well unset any errors that may exist
+  useEffect(() => {
+    setError(undefined);
+  }, [activeWallet?.address, disabled, text, JSON.stringify(location)]);
 
   return (
     <>
@@ -57,6 +74,13 @@ const PublishButton = ({ onClick, disabled, text }: PublishButtonProps) => {
         }}
         onCancel={() => setShowDisclaimer(false)}
       />
+      {error && (
+        <div className="mt-4">
+          <Banner type="error" title={error.message}>
+            {(error as ParsedAlgoClientError<any>).resolution}
+          </Banner>
+        </div>
+      )}
       <button
         onClick={async () => {
           if (isPublishing) {

@@ -81,16 +81,12 @@ const OptIn = () => {
           text={!hasAssets ? 'Add one or more assets' : undefined}
           disabled={!hasAssets}
           onClick={async () => {
-            try {
-              await signAndPublishOptInTransaction(
-                activeWallet!,
-                network,
-                assetIds
-              );
-              setAssetIds([]);
-            } catch (e) {
-              console.error(e);
-            }
+            await signAndPublishOptInTransaction(
+              activeWallet!,
+              network,
+              assetIds
+            );
+            setAssetIds([]);
           }}
         />
       </div>

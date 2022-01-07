@@ -1,12 +1,31 @@
 import BigNumber from 'bignumber.js';
 import { AssetType } from './types';
 
-export const formatAssetName = (assetId: number, asset?: AssetType) => {
-  if (asset?.params?.name && asset?.params?.unitName) {
-    return { name: `${asset.params.name} (${asset.params.unitName})`, assetId };
+const SHORT_NAME_LENGTH = 24;
+const computeShortName = (name: string, baseName?: string) => {
+  if (name.length < SHORT_NAME_LENGTH) {
+    return name;
   }
-  if (asset?.params?.name || asset?.params?.unitName) {
-    return { name: asset.params.name || asset.params.unitName, assetId };
+  if (baseName && baseName.length < SHORT_NAME_LENGTH) {
+    return baseName;
+  }
+  const bestBreak = name.slice(0, SHORT_NAME_LENGTH).match(/^(.*)\W/);
+  if (bestBreak) {
+    return `${bestBreak[1]}...`;
+  }
+  return `${name.slice(0, SHORT_NAME_LENGTH - 4)}...`;
+};
+
+export const formatAssetName = (assetId: number, asset?: AssetType) => {
+  let name: string | undefined;
+  if (asset?.params?.name && asset?.params?.unitName) {
+    name = `${asset.params.name} (${asset.params.unitName})`;
+  } else if (asset?.params?.name || asset?.params?.unitName) {
+    name = asset.params.name || asset.params.unitName;
+  }
+  if (name) {
+    const shortName = computeShortName(name, asset?.params?.name);
+    return { name, shortName, assetId };
   }
   return { name: `Asset ID: ${assetId}` };
 };
