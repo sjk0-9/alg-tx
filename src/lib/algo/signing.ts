@@ -46,16 +46,22 @@ export const publishWithToasts = async (
     throw parsedError;
   }
 
+  return response.txId;
+};
+
+export const waitWithToasts = async (
+  network: Networks,
+  txId: string,
+  toastId: string
+) => {
   toast.loading('Waiting for confirmation', { id: toastId });
 
   try {
-    await waitForTx(response.txId, network);
+    await waitForTx(txId, network);
   } catch (e) {
     toast.error('Timed out waiting for confirmation', { id: toastId });
     throw e;
   }
-
-  return response.txId;
 };
 
 export const signAndPublishWithToasts = async (
@@ -66,5 +72,6 @@ export const signAndPublishWithToasts = async (
 ) => {
   const signed = await signWithToasts(wallet, toSign, toastId);
   const transactionId = await publishWithToasts(network, signed, toastId);
+  await waitWithToasts(network, transactionId, toastId);
   return transactionId;
 };

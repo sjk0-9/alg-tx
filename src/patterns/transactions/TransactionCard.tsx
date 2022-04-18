@@ -30,6 +30,7 @@ const SignToggle = ({
   if (signable === false) {
     return null;
   }
+  return null;
   return (
     <div className="flex flex-row items-center gap-2">
       <Switch
