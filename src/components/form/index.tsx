@@ -7,11 +7,13 @@ const mergeClassName = (name: string, props: React.HTMLProps<HTMLElement>) => {
   return name;
 };
 
-const Label = (props: React.HTMLProps<HTMLLabelElement>) => (
+export const Label = (props: React.HTMLProps<HTMLLabelElement>) => (
   <label className={mergeClassName('form-label', props)} {...props} />
 );
 
-const TextInput = (props: Omit<React.HTMLProps<HTMLInputElement>, 'type'>) => (
+export const TextInput = (
+  props: Omit<React.HTMLProps<HTMLInputElement>, 'type'>
+) => (
   <input
     type="text"
     className={mergeClassName('text-input', props)}
@@ -19,12 +21,12 @@ const TextInput = (props: Omit<React.HTMLProps<HTMLInputElement>, 'type'>) => (
   />
 );
 
-const Checkbox = (props: Omit<React.HTMLProps<HTMLInputElement>, 'type'>) => (
+export const Checkbox = (
+  props: Omit<React.HTMLProps<HTMLInputElement>, 'type'>
+) => (
   <input
     type="checkbox"
     className={mergeClassName('checkbox-input', props)}
     {...props}
   />
 );
-
-export { Label, TextInput, Checkbox };

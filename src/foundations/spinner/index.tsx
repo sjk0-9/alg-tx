@@ -7,19 +7,6 @@ type SpinnerProps = {
   color?: 'white' | 'primary';
 };
 
-const getSpinnerSize = (size: SpinnerSizes) => {
-  switch (size) {
-    case 'sm':
-      return 'la-sm';
-    case 'md':
-      return '';
-    case 'lg':
-      return 'la-3x';
-    default:
-      throw new Error('Unknown size');
-  }
-};
-
 const spinnerSize = {
   sm: 'la-sm',
   md: '',

@@ -7,10 +7,10 @@ import localStorageCacheProvider from '../../../lib/helpers/localStorageCachePro
 import OptInAssetRow from './assetRow';
 import AssetSearchBar from './assetSearch';
 import useWallets from '../../../hooks/useWallets';
-import signAndPublishOptInTransaction from './transaction';
 import { NetworkContext } from '../../../contexts';
 import PublishButton from '../../../patterns/PublishButton';
 import useDocumentTitle from '../../../hooks/useTitle';
+import createTransactions from './transaction';
 
 /**
  * A shortcut to allow people to remove the
@@ -80,14 +80,9 @@ const OptIn = () => {
         <PublishButton
           text={!hasAssets ? 'Add one or more assets' : undefined}
           disabled={!hasAssets}
-          onClick={async () => {
-            await signAndPublishOptInTransaction(
-              activeWallet!,
-              network,
-              assetIds
-            );
-            setAssetIds([]);
-          }}
+          transactions={async () =>
+            createTransactions(activeWallet!, network, assetIds)
+          }
         />
       </div>
       <Outlet />

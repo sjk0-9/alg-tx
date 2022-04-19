@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import useSWR, { Fetcher } from 'swr';
 import { NetworkContext } from '../contexts';
 import getClients, { Networks } from '../lib/algo/clients';
-import { AssetType } from '../lib/algo/types';
+import { AssetHoldingType, AssetType } from '../lib/algo/types';
 import useDebounce from './useDebounce';
 
 type Internal<T> = T & {
@@ -19,7 +19,7 @@ const useBase =
   (params: P | undefined) => {
     const network = useContext(NetworkContext);
     const debounced = debounce ? useDebounce(params, 2000) : params;
-    const { data, error, isValidating } = useSWR(
+    const { data, error, isValidating, mutate } = useSWR(
       debounced !== undefined ? { ...debounced, network } : undefined,
       fetcher
     );
@@ -27,6 +27,7 @@ const useBase =
       isLoading: !data && !error && !!params,
       isValidating,
       error,
+      mutate,
       ...dataFormatter(data),
     };
   };
@@ -132,3 +133,62 @@ export const useAssetLookup = useBase<
   AssetLookupResult,
   { asset?: AssetLookupResult }
 >(assetLookupFetcher, d => ({ asset: d }));
+
+/*
+ * =============================
+ * Account Asset Lookup
+ * =============================
+ */
+
+type AccountAssetLookupResult = AssetHoldingType[];
+
+type AccountAssetLookupParams = {
+  account: string;
+  assetId?: number;
+  includeAll?: boolean;
+};
+
+type AccountAssetLookupFetcher = Fetcher<
+  AccountAssetLookupResult,
+  Internal<AccountAssetLookupParams>
+>;
+
+const accountAssetLookupFetcher: AccountAssetLookupFetcher = async ({
+  network,
+  account,
+  assetId,
+  includeAll,
+}: Internal<AccountAssetLookupParams>) => {
+  console.log('Hello');
+  const { indexerClient } = getClients(network);
+  let next: string | undefined;
+  const assets = [];
+  while (true) {
+    console.log('here');
+    let query = indexerClient.lookupAccountAssets(account);
+    if (assetId) {
+      query = query.assetId(assetId);
+    }
+    if (includeAll) {
+      query = query.includeAll(includeAll);
+    }
+    if (next) {
+      query = query.nextToken(next);
+    }
+    console.log('now');
+    console.log(query);
+    const result = await query.do();
+    console.log(result);
+    next = result['next-token'];
+    assets.push(...result.assets.map(toCamelCase));
+    if (!next) {
+      return assets as AccountAssetLookupResult;
+    }
+  }
+};
+
+export const useAccountAssetLookup = useBase<
+  AccountAssetLookupParams,
+  AccountAssetLookupResult,
+  { assets?: AccountAssetLookupResult }
+>(accountAssetLookupFetcher, d => ({ assets: d }));

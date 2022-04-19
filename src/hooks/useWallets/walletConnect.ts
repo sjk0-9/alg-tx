@@ -39,6 +39,7 @@ const createNewConnector = async (): Promise<[string, WalletConnect]> => {
 const sign =
   (connector: WalletConnect) =>
   async (txs: TxToSign[]): Promise<Uint8Array[]> => {
+    console.log('Sign with walletconnect');
     const txnWithbuffers = txs.map(({ txn, viewOnly, message }) => {
       let encodedTxn: Uint8Array;
       if (isSigned(txn)) {
@@ -58,11 +59,14 @@ const sign =
       };
       return pickBy(result, identity);
     });
+    console.log(txnWithbuffers);
 
     const request = formatJsonRpcRequest('algo_signTxn', [txnWithbuffers]);
+    console.log('send request');
     const result: Array<string | null> = await connector.sendCustomRequest(
       request
     );
+    console.log('received', result);
     const decodedResult = result.map(r =>
       r ? new Uint8Array(Buffer.from(r, 'base64')) : null
     );
@@ -146,8 +150,6 @@ const useWalletConnect = (): [Wallet[], () => Promise<void>] => {
   const wallets = wcWallets.filter(
     ({ missingConnection }) => !missingConnection
   ) as Wallet[];
-
-  console.log('Call to Wallet Connect');
 
   return [wallets, connectToWalletConnect];
 };

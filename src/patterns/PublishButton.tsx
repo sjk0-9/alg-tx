@@ -1,20 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 import Banner from '../components/Banner';
 import ExternalLink from '../components/ExternalLink';
+import { createCustomLoadingToast } from '../components/Toast';
 import { NetworkContext } from '../contexts';
 import WrappedSpinner from '../foundations/spinner/wrapped';
 import useWallets from '../hooks/useWallets';
 import { TxToSign, Wallet } from '../hooks/useWallets/types';
 import { walletName } from '../hooks/useWallets/utils';
-import { Networks } from '../lib/algo/clients';
-import { ParsedAlgoClientError } from '../lib/algo/errors/parseClientError';
-import {
-  signWithToasts,
-  publishWithToasts,
-  waitWithToasts,
-} from '../lib/algo/signing';
+import getClients, { Networks } from '../lib/algo/clients';
+import parseClientError, {
+  AlgoClientError,
+  ParsedAlgoClientError,
+} from '../lib/algo/errors/parseClientError';
 import { isSigned } from '../lib/algo/transactions';
+import { waitForTx } from '../lib/algo/wait';
 import { s } from '../lib/helpers/string';
 import Disclaimer, { DISCLAIMER_VERSION } from './DisclaimerModal';
 
@@ -42,6 +43,10 @@ export type PublishState =
       data: { error: Error } & Pick<PublishStateData, 'toSign'>;
     }
   | {
+      state: 'cancelled-signing';
+      data: Pick<PublishStateData, 'toSign'>;
+    }
+  | {
       state: 'failed-publishing';
       data: { error: Error } & Pick<PublishStateData, 'toSign' | 'signed'>;
     }
@@ -60,16 +65,18 @@ export type PublishState =
 
 type PublishButtonProps = {
   onStateUpdate?: (newState: PublishState) => void;
-  transactions: TxToSign[];
+  transactions: TxToSign[] | (() => Promise<TxToSign[]>);
   disabled?: boolean;
   text?: string;
 };
 
-const getQty = (transactions: TxToSign[]) =>
-  transactions.filter(tx => !tx.viewOnly).length;
+const getQty = (transactions: PublishButtonProps['transactions']) =>
+  Array.isArray(transactions)
+    ? transactions.filter(tx => !tx.viewOnly).length
+    : undefined;
 
 const isReadyToPublish = (transactions: TxToSign[]) =>
-  transactions.find(tx => tx.viewOnly && !isSigned(tx.txn)) !== undefined;
+  transactions.find(tx => tx.viewOnly && !isSigned(tx.txn)) === undefined;
 
 const signButtonTxt = (
   otherText: string | undefined,
@@ -130,15 +137,65 @@ const PublishButton = ({
   };
 
   const publish = async () => {
-    const toSign = transactions;
-    const willPublish = isReadyToPublish(toSign);
-    const toastId = 'sign-and-publish';
+    /* ============================
+     * Preparing transactions
+     * ============================ */
     setError(undefined);
     setIsPublishing(true);
-    setState({ state: 'signing', data: { toSign } });
-    let signed: Uint8Array[];
+    let toSign: TxToSign[];
+    const toastId = 'sign-and-publish';
+    if (!Array.isArray(transactions)) {
+      createCustomLoadingToast('Preparing transaction', { id: toastId });
+    }
     try {
-      signed = await signWithToasts(activeWallet!, toSign, toastId);
+      toSign = Array.isArray(transactions)
+        ? transactions
+        : await transactions();
+    } catch (e) {
+      setIsPublishing(false);
+      setError(e as Error);
+      toast.error('Error preparing transaction', { id: toastId });
+      setTimeout(() => toast.dismiss(toastId), 2000);
+      return;
+    }
+
+    const willPublish = isReadyToPublish(toSign);
+
+    /* ============================
+     * Signing transactions
+     * ============================ */
+    let signed: Uint8Array[] | null;
+    setState({ state: 'signing', data: { toSign } });
+
+    let cancelledSigning = false;
+    const toastText = {
+      WalletConnect: 'Waiting for Pera Algo App',
+      MyAlgo: 'Waiting for My Algo',
+    }[activeWallet!.type];
+
+    createCustomLoadingToast(
+      {
+        text: toastText,
+        linkText: 'cancel',
+        onLinkClick: () => {
+          cancelledSigning = true;
+        },
+      },
+      { id: toastId }
+    );
+
+    try {
+      signed = (await Promise.any([
+        activeWallet!.sign(toSign),
+        (async () => {
+          while (cancelledSigning === false) {
+            await new Promise(resolve => {
+              setTimeout(resolve, 100);
+            });
+          }
+          return null;
+        })(),
+      ])) as Uint8Array[] | null;
     } catch (e) {
       setIsPublishing(false);
       setError(e as Error);
@@ -146,28 +203,64 @@ const PublishButton = ({
         state: 'failed-signing',
         data: { error: e as Error, toSign },
       });
+      toast.error('Error signing transaction', { id: toastId });
+      setTimeout(() => toast.dismiss(toastId), 2000);
+      return;
+    }
+
+    if (!signed) {
+      setState({ state: 'cancelled-signing', data: { toSign } });
+      setIsPublishing(false);
+      toast('Transaction cancelled', { id: toastId });
+      setTimeout(() => toast.dismiss(toastId), 2000);
       return;
     }
     if (!willPublish) {
       setState({ state: 'success-sign-only', data: { toSign, signed } });
       setIsPublishing(false);
+      toast.success('Transaction signed', { id: toastId });
+      setTimeout(() => toast.dismiss(toastId), 2000);
       return;
     }
+
+    /* ============================
+     * Publishing transactions
+     * ============================ */
+
+    createCustomLoadingToast('Sending transaction', { id: toastId });
+
     let txId: string;
+    const { algodClient } = getClients(network);
     try {
-      txId = await publishWithToasts(network, signed, toastId);
+      ({ txId } = await algodClient.sendRawTransaction(signed).do());
     } catch (e) {
+      const parsedError = parseClientError(e as AlgoClientError);
       setIsPublishing(false);
-      setError(e as Error);
+      setError(parsedError);
       setState({
         state: 'failed-publishing',
-        data: { error: e as Error, toSign, signed },
+        data: { error: parsedError, toSign, signed },
       });
+      toast.error('Error from algo client', { id: toastId });
+      setTimeout(() => toast.dismiss(toastId), 2000);
+      console.error(
+        parsedError.message,
+        parsedError.type,
+        parsedError.data,
+        JSON.stringify(parsedError.original)
+      );
       return;
     }
+
+    /* ============================
+     * Waiting for transactions
+     * ============================ */
+
+    createCustomLoadingToast('Waiting for confirmation', { id: toastId });
     setState({ state: 'waiting', data: { txId, toSign, signed } });
+
     try {
-      await waitWithToasts(network, txId, toastId);
+      await waitForTx(txId, network);
     } catch (e) {
       setIsPublishing(false);
       setError(e as Error);
@@ -175,10 +268,15 @@ const PublishButton = ({
         state: 'failed-waiting',
         data: { error: e as Error, toSign, signed, txId },
       });
+      toast.error('Timed out waiting for confirmation', { id: toastId });
+      setTimeout(() => toast.dismiss(toastId), 2000);
       return;
     }
+
     setState({ state: 'success', data: { toSign, signed, txId } });
     setIsPublishing(false);
+    toast.success('Success!', { id: toastId });
+    setTimeout(() => toast.dismiss(toastId), 2000);
   };
 
   // If something's changed, we might as well unset any errors that may exist
