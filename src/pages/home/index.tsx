@@ -25,6 +25,14 @@ const Home = () => (
         <Link to="./opt-in">Bulk asset opt in</Link>
       </li>
       <li>
+        <Link to="./opt-out">Bulk asset opt out</Link>
+      </li>
+      <li>
+        Algorand atomic transaction interface - contact{' '}
+        <ExternalLink to="https://twitter.com/sjk0_9">SJK</ExternalLink> for
+        details
+      </li>
+      <li>
         <span className="text-subtle">More coming soon</span>
       </li>
     </ul>

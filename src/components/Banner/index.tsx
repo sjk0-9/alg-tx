@@ -2,7 +2,7 @@ import React from 'react';
 import './banner.css';
 
 type BannerProps = {
-  type: 'error' | 'warning';
+  type: 'error' | 'warning' | 'notice';
   size?: 'md' | 'sm';
   title?: string;
   children: React.ReactNode;
@@ -11,6 +11,7 @@ type BannerProps = {
 const typeToClass = {
   error: 'banner-error',
   warning: 'banner-warning',
+  notice: 'banner-notice',
 };
 
 const Banner = ({ type, title, children, size = 'md' }: BannerProps) => (

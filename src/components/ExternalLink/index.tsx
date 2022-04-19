@@ -13,11 +13,12 @@ const ExternalLink = ({ to, children, icon = true }: ExternalLinkProps) => (
     target="_blank"
     rel="noopener noreferrer"
     className="external-link"
+    onClick={e => {
+      e.stopPropagation();
+    }}
   >
     {children}
   </a>
 );
 
-// {icon && <ExternalLinkIcon className="w-4 h-4" />}
-// className={`inline-flex w-min whitespace-nowrap after:content-['url("${ExternalLinkIcon}")']`}
 export default ExternalLink;

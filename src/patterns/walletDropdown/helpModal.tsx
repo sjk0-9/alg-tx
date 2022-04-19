@@ -16,13 +16,13 @@ const HelpDialog = ({
     title="Help"
     description="Help for connecting your algorand wallet"
   >
-    <h3 className="py-2 font-medium">The Algorand App won&apos;t connect</h3>
+    <h3 className="py-2 font-medium">The Pera Algo App won&apos;t connect</h3>
     <p className="py-1">
       The WalletConnect service can be a bit difficult at times.
     </p>
     <p className="py-1">
       The QR code can&apos;t be read by your normal Camera or QR scan app. Make
-      sure you&apos;e scanning the QR code from the official Algorand App.
+      sure you&apos;e scanning the QR code from the official Pera Algo App.
     </p>
     <p className="py-1">
       If it still doesn&apos;t work, try quitting and reopening the wallet app

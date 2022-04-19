@@ -40,4 +40,10 @@
       text-white;
   }
 
+  .btn-link {
+    @apply
+      text-primary
+      underline;
+  }
+
 }

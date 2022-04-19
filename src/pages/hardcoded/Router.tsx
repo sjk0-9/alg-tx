@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 import { Route } from 'react-router-dom';
 import { NetworkContext } from '../../contexts';
 import OptIn, { RedirectOptIn } from './OptIn';
+import OptOut from './OptOut';
 
 type RoutesList = React.ReactElement[];
 
@@ -15,6 +16,7 @@ const sharedRoutes: RoutesList = [
     <Route key="opt-in" path=":assetId" element={<RedirectOptIn />} />,
     <Route key="opt-in" path="asset/:assetId" element={<RedirectOptIn />} />,
   </Route>,
+  <Route key="opt-out" path="opt-out" element={<OptOut />} />,
 ];
 
 const hardcodedRouteList = () => {

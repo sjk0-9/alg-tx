@@ -1,0 +1,23 @@
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .no-sign-icon {
+    @apply
+      hidden;
+  }
+  .sign-icon {
+    @apply
+      w-5 h-5
+      text-subtle
+      hover:text-subtle-h
+      active:text-subtle-a;
+  }
+  .sign-icon-will-sign {
+    @apply
+      sign-icon
+      text-primary
+      hover:text-primary-h
+      active:text-primary-a;
+  }
+}

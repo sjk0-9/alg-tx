@@ -233,7 +233,7 @@ const WalletDropdown = () => {
                 )}
                 <div className="menu-item-section">
                   <AddWalletRow
-                    name="Algorand App"
+                    name="Pera Algo App"
                     connector={connectors.walletConnect}
                   />
                   <AddWalletRow

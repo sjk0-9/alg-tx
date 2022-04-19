@@ -25,3 +25,15 @@ export type AssetType = {
     urlB64?: string;
   };
 };
+
+/**
+ * AssetHolding type as returned by the indexer but with camelCase key names.
+ */
+export type AssetHoldingType = {
+  amount: number | BigInt;
+  assetId: number;
+  deleted?: boolean;
+  isFrozen?: boolean;
+  optedInAtRound?: number;
+  optedOutAtRound?: number;
+};

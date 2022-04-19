@@ -10,7 +10,7 @@ export const findWallet = (address: string | Address, wallets: Wallet[]) => {
 export const prettyWalletType = (wallet: Wallet) => {
   switch (wallet.type) {
     case 'WalletConnect':
-      return 'Algorand App';
+      return 'Pera Algo App';
     case 'MyAlgo':
       return 'My Algo';
     default:

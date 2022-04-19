@@ -24,6 +24,13 @@
       border-yellow-700;
   }
 
+  .banner-notice {
+    @apply
+      banner
+      bg-grey-200
+      border-grey-500;
+  }
+
   .banner-sm {
     @apply
       text-sm;
