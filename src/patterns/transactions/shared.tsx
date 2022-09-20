@@ -58,7 +58,7 @@ const PaymentTransactionContent = ({
   <div>
     <div className="flex flex-col">
       <div className="text-2xl whitespace-nowrap">
-        {microalgosToAlgos(Number(txn.amount))} ALGO
+        {microalgosToAlgos(Number(txn.amount || 0))} ALGO
       </div>
       <AddressTransfer from={txn.from} to={txn.to} />
     </div>
