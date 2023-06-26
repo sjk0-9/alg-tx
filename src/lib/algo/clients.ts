@@ -8,15 +8,15 @@ type ServerAddress = {
 
 const ALGOD_TOKEN = '';
 const ALGOD_SERVER: ServerAddress = {
-  mainnet: 'https://node.algoexplorerapi.io/',
-  testnet: 'https://node.testnet.algoexplorerapi.io/',
+  mainnet: 'https://mainnet-api.algonode.cloud',
+  testnet: 'https://testnet-api.algonode.cloud',
 };
 const ALGOD_PORT = '443';
 
 const INDEXER_TOKEN = '';
 const INDEXER_SERVER: ServerAddress = {
-  mainnet: 'https://algoindexer.algoexplorerapi.io/',
-  testnet: 'https://algoindexer.testnet.algoexplorerapi.io/',
+  mainnet: 'https://mainnet-idx.algonode.cloud',
+  testnet: 'https://testnet-idx.algonode.cloud',
 };
 const INDEXER_PORT = '443';
 
