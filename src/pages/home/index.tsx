@@ -11,13 +11,16 @@ const Home = () => (
     </div>
     <p className="my-2">Welcome to {NAME}.</p>
     <p className="my-2">
-      This dapp is currently in very early alpha. There is a lot of work to do,
-      and a lot of stuff that probably doesn&apos;t work quite right.
+      {NAME} likely does not work anymore. For a variety of reasons, future
+      support will not be provided and the dapp won&apos;t be maintained.
     </p>
     <p className="my-2">
-      That said, there&apos;s also a lot of new and exciting stuff coming soon.
-      Stay tuned, and while you&apos;re waiting, feel free to make use of some
-      of our handy tools.
+      However all code has been released under the MIT licesnse and is available
+      on:{' '}
+      <a href="https://github.com/sjk0-9/alg-tx/">
+        https://github.com/sjk0-9/akg-tx/
+      </a>{' '}
+      for anyone interested in using it as a basis for their own project.
     </p>
     <h3 className="my-2">Algorand Tools</h3>
     <ul className="list-disc list-inside">
