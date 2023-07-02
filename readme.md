@@ -46,6 +46,106 @@ This will create a directory `dist/`.
 Upload the full directory to any of a number of hosting services, and you'll be able to access the website, live, on the internet.
 I used [fleek.co](https://fleek.co/) as it is insanely easy to set up and integrate so that pushes to github immediately start a build that then gets automatically released.
 
+## Atomic Transaction Examples
+
+These are the code examples I've shared for helping people generate their own atomic transaction URLs.
+
+Knowing the address of the end user, you create a group of transactions, some that need to be signed by you, some by the end user. You then assign the group id, sign your ones, encode them in base64, and append them to the end of the `alg-tx.com/#/a/` url, joined by a `;`.
+
+In both examples, a user pays 10 algos and opts into an asset, and the "bot" will then transfer 1 copy of
+that asset to the user.
+
+### Javascript
+
+```javascript
+import algosdk from 'algosdk';
+import algodClient from '../wherever/you/have/defined/your/client';
+
+const algTxBaseUrl = `https://alg-tx.com/#/a/`;
+const BOT_ADDRESS = '<BOT_ADDRESS>';
+const { sk: BOT_SK } = algosdk.mnemonicToSecretKey('<BOT_MNEMONIC>');
+const ASSET_ID = 123456
+
+/**
+ * Takes an array of signed and unsigned Algorand transactions.
+ * Transactions should all belong to the same atomic group.
+ * Returns a string of the URL for the user to sign.
+ */
+export const buildAlgTxUrl = (transactions) => {
+  const encodedTransactions = transactions.map(tx => {
+    // If it's a Uint8Array, it's a transaction we've signed
+    // It's already encoded.
+    if (tx instanceof Uint8Array) {
+      return tx;
+    }
+    return algosdk.encodeUnsignedTransaction(tx);
+  });
+  const b64Transactions = encodedTransactions.map(txn =>
+    Buffer.from(txn).toString('base64')
+  );
+  const url = `${algTxBaseUrl}${b64Transactions.join(';')}`;
+  return url;
+};
+
+const wrapTx = async (userAddress) => {
+  const params = await algodClient.getTransactionParameters.do();
+  const userTransactions = [
+    // User sending their algo
+    algosdk.makePaymentTxnWithSuggestedParams(
+      userAddress, BOT_ADDRESS, algosdk.algosToMicroAlgos(10), undefined, undefined, params
+    ),
+    // User opt into new asset in case they haven't already
+    // (No harm besides minuscule fee if they already are)
+    algosdk.makeAssetTransferTxnWithSuggestedParams(
+      userAddress, userAddress, undefined, undefined, 0, undefined, ASSET_ID, params
+    ),
+  ];
+  const botTransactions = [
+    algosdk.makeAssetTransferTxnWithSuggestedParams(
+      BOT_ADDRESS, userAddress, undefined, undefined, 1, undefined, ASSET_ID, params
+    ),
+  ];
+  algosdk.assignGroupId([...userTransactions, ...botTransactions]);
+  const signedBotTransactions = botTransactions.map(txn => txn.sign(BOT_SK));
+  const url = buildAlgTxUrl([...userTransactions, ...signedBotTransactions]);
+  return url;
+}
+```
+
+### Python
+
+```python
+from algosdk.v2client import algod
+from algosdk.util import algos_to_microalgos
+from algosdk import encoding
+from algosdk.future.transaction import AssetTransferTxn, AssetOptInTxn, PaymentTxn, assign_group_id
+
+ac = algod.AlgodClient(API_TOKEN, ALGOD_ADDRESS, API_HEADERS)
+BOT_ADDRESS = 'SOMEALGOADDRESS...'
+BOT_PK = 'Private Key of the bot'
+ASSET_ID = 123456
+
+def generate_link(user_addresss):
+  params = ac.suggested_params()
+  
+  tx1 = PaymentTxn(
+    user_address, params, BOT_ADDRESS, algos_to_microalgos(10)
+  )
+  tx2 = AssetOptInTxn(
+    user_address, params, ASSET_ID
+  )
+  tx3 = AssetTransferTxn(
+    BOT_ADDRESS, params, user_address, 1, ASSET_ID
+  )
+  assign_group_id([tx1, tx2, tx3])
+  signed_tx3 = tx2.sign(BOT_PK)
+  txns = [tx1, tx2, signed_tx3]
+
+  encoded = [encoding.msgpack_encode(tx) for tx in txns]
+
+  address = f"alg-tx.com/#/a/{';'.join(encoded)}"
+```
+
 ## Closing
 
 I appreciate all the support and encouragement that the algorand community has been.
